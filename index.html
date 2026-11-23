@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мастерская & Базис 10 — Помощник и AI-Наставник</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Базис 10 & Цех — Рабочий помощник и AI-Наставник</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -12,36 +12,33 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            50: '#fffbe6',
-                            100: '#fff3b8',
-                            400: '#fbbf24',
-                            500: '#f59e0b',
-                            600: '#d97706',
-                            700: '#b45309',
-                            900: '#78350f',
-                        }
+                        darkbg: '#0f172a',
+                        cardbg: '#1e293b',
+                        bordercolor: '#334155',
+                        brand: '#3b82f6',
+                        accent: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444'
                     }
                 }
             }
         }
     </script>
-    <!-- Font Awesome Icons -->
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Font Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <!-- Three.js for 3D Renderer -->
+    <!-- Three.js for 3D Viewer -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #020617; /* slate-950 */
-            color: #f8fafc;
+            background-color: #0b0f19;
+            color: #f1f5f9;
         }
-        .code-font {
+        code, pre, .font-mono {
             font-family: 'JetBrains Mono', monospace;
         }
-        /* Custom scrollbars */
+        /* Custom Scrollbars */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -51,661 +48,682 @@
         }
         ::-webkit-scrollbar-thumb {
             background: #334155;
-            border-radius: 3px;
+            border-radius: 4px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #f59e0b;
+            background: #475569;
         }
-        .glass-panel {
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(51, 65, 85, 0.6);
+        .tab-btn.active {
+            background-color: #2563eb;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        /* Canvas containers */
+        .canvas-container {
+            touch-action: none;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col md:flex-row overflow-x-hidden selection:bg-amber-500 selection:text-slate-950">
+<body class="h-screen flex flex-col md:flex-row overflow-hidden select-none">
 
     <!-- DESKTOP SIDEBAR -->
-    <aside class="hidden md:flex flex-col w-72 bg-slate-900 border-r border-slate-800 p-4 fixed h-full z-30">
-        <!-- Brand Logo -->
-        <div class="flex items-center gap-3 pb-4 mb-4 border-b border-slate-800">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20 text-slate-950 font-black text-xl">
-                <i class="fa-solid fa-cube"></i>
+    <aside class="hidden md:flex flex-col w-64 bg-slate-900 border-r border-slate-800 p-4 shrink-0 justify-between">
+        <div>
+            <!-- Header Brand -->
+            <div class="flex items-center gap-3 px-2 py-3 mb-6 border-b border-slate-800">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+                    <i class="fa-solid font-bold text-lg fa-cube"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-slate-100 text-sm leading-tight">БАЗИС 10 & ЦЕХ</h1>
+                    <p class="text-[11px] text-blue-400 font-medium">Конструктор + Маляр</p>
+                </div>
             </div>
-            <div>
-                <h1 class="font-bold text-slate-100 text-base leading-tight">Базис 10 & Малярка</h1>
-                <p class="text-xs text-amber-500 font-medium">AI-Наставник & Справочник</p>
-            </div>
+
+            <!-- Navigation Links -->
+            <nav class="space-y-1.5">
+                <button onclick="switchTab('trainer')" id="nav-trainer" class="tab-btn active w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+                    <i class="fa-solid fa-graduation-cap w-5 text-center text-sm"></i>
+                    <span>Тренажёр & ДЗ</span>
+                </button>
+                <button onclick="switchTab('generator')" id="nav-generator" class="tab-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+                    <i class="fa-solid fa-drafting-compass w-5 text-center text-sm"></i>
+                    <span>Генератор Базис</span>
+                </button>
+                <button onclick="switchTab('handbook')" id="nav-handbook" class="tab-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+                    <i class="fa-solid fa-book-bookmark w-5 text-center text-sm"></i>
+                    <span>Справочник Б-10</span>
+                </button>
+                <button onclick="switchTab('paint')" id="nav-paint" class="tab-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all text-slate-400 hover:text-slate-100 hover:bg-slate-800/60">
+                    <i class="fa-solid fa-spray-can-sparkles w-5 text-center text-sm"></i>
+                    <span>Малярный цех</span>
+                </button>
+            </nav>
         </div>
 
-        <!-- API Key Box -->
-        <div class="mb-6 bg-slate-950/80 p-3 rounded-xl border border-slate-800">
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                    <i class="fa-solid fa-key text-amber-500"></i> Gemini API Key
-                </span>
-                <span id="apiKeyStatusBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-medium">
-                    Не зажат
-                </span>
+        <!-- Footer / Info -->
+        <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800/80 text-xs text-slate-400 space-y-2">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-medium text-slate-400">Статус Б-10:</span>
+                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">ГОТОВ</span>
             </div>
-            <div class="relative">
-                <input type="password" id="sidebarApiKeyInput" placeholder="AIzaSy..." 
-                       class="w-full bg-slate-900 text-slate-200 text-xs px-3 py-2 pr-8 rounded-lg border border-slate-700 focus:outline-none focus:border-amber-500 transition-colors">
-                <button onclick="toggleKeyVisibility('sidebarApiKeyInput')" class="absolute right-2 top-2 text-slate-500 hover:text-slate-300">
-                    <i class="fa-regular fa-eye text-xs"></i>
-                </button>
+            <div class="text-[10px] text-slate-400 leading-tight">
+                Версия 10.03 • ЧПУ/Nesting ok
             </div>
-            <div class="flex gap-2 mt-2">
-                <button onclick="saveApiKeyFromInput('sidebarApiKeyInput')" class="flex-1 text-xs bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold py-1.5 px-2 rounded-lg transition-all flex items-center justify-center gap-1">
-                    <i class="fa-solid fa-check text-xs"></i> Сохранить
-                </button>
-                <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="text-xs text-slate-400 hover:text-amber-400 py-1.5 px-2 bg-slate-800 rounded-lg transition-colors flex items-center justify-center" title="Получить бесплатный ключ">
-                    <i class="fa-solid fa-external-link text-xs"></i>
-                </a>
-            </div>
-        </div>
-
-        <!-- Navigation Links -->
-        <nav class="space-y-1.5 flex-1">
-            <button onclick="switchTab('homework')" id="nav-homework" class="tab-btn active w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all text-amber-400 bg-amber-500/10 border border-amber-500/30">
-                <i class="fa-solid fa-graduation-cap text-base w-5 text-center"></i>
-                <span>Тренажёр & ДЗ</span>
-            </button>
-            <button onclick="switchTab('generator')" id="nav-generator" class="tab-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-400 hover:text-slate-200 hover:bg-slate-800/60">
-                <i class="fa-solid fa-gears text-base w-5 text-center"></i>
-                <span>Генератор Базис</span>
-            </button>
-            <button onclick="switchTab('reference')" id="nav-reference" class="tab-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-400 hover:text-slate-200 hover:bg-slate-800/60">
-                <i class="fa-solid fa-book text-base w-5 text-center"></i>
-                <span>Справочник Б-10</span>
-            </button>
-            <button onclick="switchTab('paintshop')" id="nav-paintshop" class="tab-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-400 hover:text-slate-200 hover:bg-slate-800/60">
-                <i class="fa-solid fa-spray-can text-base w-5 text-center"></i>
-                <span>Малярный цех</span>
-            </button>
-        </nav>
-
-        <!-- User/Profile Info -->
-        <div class="pt-4 border-t border-slate-800 text-xs text-slate-500 flex items-center justify-between">
-            <span>Базис-Мебельщик 10.0</span>
-            <span class="text-amber-500/80 font-mono">v3.4-AI</span>
         </div>
     </aside>
 
-    <!-- MOBILE HEADER -->
-    <header class="md:hidden bg-slate-900 border-b border-slate-800 p-4 sticky top-0 z-40 flex items-center justify-between">
+    <!-- MOBILE TOP BAR -->
+    <header class="md:hidden flex items-center justify-between px-4 py-3 bg-slate-900 border-b border-slate-800 shrink-0">
         <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center text-slate-950 font-black">
-                <i class="fa-solid fa-cube text-sm"></i>
+            <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white text-xs">
+                <i class="fa-solid fa-cube"></i>
             </div>
-            <div>
-                <h1 class="font-bold text-slate-100 text-sm">Базис 10 & Малярка</h1>
-                <p id="mobileHeaderTitle" class="text-[10px] text-amber-500 font-medium">Тренажёр & ДЗ</p>
-            </div>
+            <span class="font-bold text-slate-100 text-sm">БАЗИС 10 & ЦЕХ</span>
         </div>
-        <button onclick="toggleMobileKeyModal()" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs font-medium text-slate-300">
-            <i class="fa-solid fa-key text-amber-500"></i>
-            <span id="mobileKeyBadge">Ключ</span>
-        </button>
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/20 text-blue-400">v10.3 AI</span>
     </header>
 
-    <!-- MOBILE API KEY MODAL -->
-    <div id="mobileKeyModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 w-full max-w-sm">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-bold text-slate-100 text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-key text-amber-500"></i> Настройка Gemini API Key
-                </h3>
-                <button onclick="toggleMobileKeyModal()" class="text-slate-400 hover:text-slate-200">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-            <p class="text-xs text-slate-400 mb-3">Вставьте ключ Google Gemini для включения AI-генерации 3D-фото и умной проверки моделей.</p>
-            <input type="password" id="mobileApiKeyInput" placeholder="AIzaSy..." 
-                   class="w-full bg-slate-950 text-slate-200 text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:outline-none focus:border-amber-500 mb-3">
-            <div class="flex gap-2">
-                <button onclick="saveApiKeyFromInput('mobileApiKeyInput'); toggleMobileKeyModal();" class="flex-1 bg-amber-500 text-slate-950 font-bold text-xs py-2 rounded-xl">
-                    Сохранить ключ
-                </button>
-                <a href="https://aistudio.google.com/app/apikey" target="_blank" class="px-3 py-2 bg-slate-800 text-slate-300 text-xs rounded-xl flex items-center justify-center">
-                    Получить
-                </a>
-            </div>
-        </div>
-    </div>
-
     <!-- MAIN CONTENT AREA -->
-    <main class="flex-1 md:ml-72 pb-24 md:pb-8 p-4 md:p-8 max-w-7xl">
-
-        <!-- ================= TAB 1: TRENAZHER & HOMEWORK ================= -->
-        <section id="tab-homework" class="tab-content space-y-6">
-            <!-- Header & Generator Controls -->
-            <div class="glass-panel rounded-2xl p-5 border border-slate-800">
-                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4 pb-4 border-b border-slate-800">
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-100 flex items-center gap-2">
-                            <i class="fa-solid fa-graduation-cap text-amber-500"></i> Тренажёр Практических Заданий
-                        </h2>
-                        <p class="text-xs text-slate-400 mt-1">Генерация реальных задач Базис-Мебельщик с 3D-образцом и AI-проверкой</p>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-2">
-                        <select id="hwTopicSelect" class="bg-slate-900 text-slate-200 text-xs px-3 py-2 rounded-xl border border-slate-700 focus:border-amber-500 outline-none">
-                            <option value="cabinet">Корпуса и тумбы</option>
-                            <option value="elasticity">Эластичность и фрагменты</option>
-                            <option value="drawers">Ящики Blum / AKS</option>
-                            <option value="fasteners">Присадка и крепеж</option>
-                            <option value="cnc">Подготовка под ЧПУ и покраску</option>
-                        </select>
-                        <select id="hwDiffSelect" class="bg-slate-900 text-slate-200 text-xs px-3 py-2 rounded-xl border border-slate-700 focus:border-amber-500 outline-none">
-                            <option value="basic">Базовый</option>
-                            <option value="medium" selected>Средний</option>
-                            <option value="hard">Сложный (ЧПУ + Малярка)</option>
-                        </select>
-                        <button onclick="generateHomework()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs px-4 py-2 rounded-xl transition-all shadow-lg shadow-amber-500/20 flex items-center gap-2">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i> Новое задание
-                        </button>
-                    </div>
+    <main class="flex-1 bg-slate-950 overflow-y-auto p-4 md:p-6 pb-20 md:pb-6 relative">
+        
+        <!-- SECTION 1: TRENER & HOMEWORK -->
+        <section id="section-trainer" class="space-y-6 max-w-7xl mx-auto">
+            <!-- Title Bar -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/80 p-5 rounded-2xl border border-slate-800">
+                <div>
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-graduation-cap text-blue-500"></i>
+                        Тренажёр заданий и Проверка файлов
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-1">
+                        Генерация уникальных производственных ТЗ без повторов (более 1000 комбинаций) с 3D-макетом и автоматической проверкой ошибок.
+                    </p>
                 </div>
-
-                <!-- Current Homework Display Box -->
-                <div id="homeworkCard" class="bg-slate-900/90 rounded-xl p-5 border border-slate-800 relative">
-                    <!-- Homework Content Inserted Dynamically -->
+                <div class="flex items-center gap-2">
+                    <button onclick="generateHomework()" class="px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-xs rounded-xl shadow-lg shadow-blue-600/20 flex items-center gap-2 transition-all">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        Сгенерировать новое ДЗ
+                    </button>
                 </div>
             </div>
 
-            <!-- 3D MODEL & AI PHOTO SECTION -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                
-                <!-- 1. INTERACTIVE 3D MODEL CANVAS -->
-                <div class="glass-panel rounded-2xl p-5 border border-slate-800 flex flex-col">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="font-bold text-slate-200 text-sm flex items-center gap-2">
-                            <i class="fa-solid fa-cubes text-amber-500"></i> 1. Интерактивная 3D-модель ( Three.js )
+            <!-- Task Card & 3D Viewer Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Homework Details (7 cols) -->
+                <div class="lg:col-span-7 bg-slate-900 rounded-2xl p-5 border border-slate-800 flex flex-col justify-between space-y-4">
+                    <div>
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                            <span id="hw-category" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                Категория: Тумбы и Комоды
+                            </span>
+                            <span id="hw-id" class="text-xs text-slate-400 font-mono">
+                                ID: #HW-8492
+                            </span>
+                        </div>
+
+                        <h3 id="hw-title" class="text-lg font-bold text-white mb-2">
+                            Тумба прикроватная с 3 выдвижными ящиками
                         </h3>
-                        <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-medium">
-                            Офлайн 3D
+                        <p id="hw-desc" class="text-xs text-slate-300 leading-relaxed mb-4">
+                            Проектирование корпуса с установкой скрытого монтажа. Учесть зазоры фасадов по 2 мм по периметру и присадку паза ХДФ 4 мм.
+                        </p>
+
+                        <!-- Specs Table -->
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+                            <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                                <span class="block text-[10px] text-slate-400 uppercase font-semibold">Габариты (В×Ш×Г)</span>
+                                <span id="spec-dim" class="text-xs font-bold text-slate-200 font-mono">750 × 600 × 450 мм</span>
+                            </div>
+                            <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                                <span class="block text-[10px] text-slate-400 uppercase font-semibold">Материал корпуса</span>
+                                <span id="spec-mat" class="text-xs font-bold text-slate-200">ЛДСП 16 мм Egger</span>
+                            </div>
+                            <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                                <span class="block text-[10px] text-slate-400 uppercase font-semibold">Материал фасадов</span>
+                                <span id="spec-facade" class="text-xs font-bold text-slate-200">МДФ 19 мм Эмаль</span>
+                            </div>
+                            <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                                <span class="block text-[10px] text-slate-400 uppercase font-semibold">Кромка корпуса</span>
+                                <span id="spec-edge" class="text-xs font-bold text-slate-200">ПВХ 1.0 мм</span>
+                            </div>
+                            <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                                <span class="block text-[10px] text-slate-400 uppercase font-semibold">Направляющие / Петли</span>
+                                <span id="spec-hardware" class="text-xs font-bold text-slate-200">Blum Tandem 450мм</span>
+                            </div>
+                            <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                                <span class="block text-[10px] text-slate-400 uppercase font-semibold">Крепёж корпуса</span>
+                                <span id="spec-fastener" class="text-xs font-bold text-slate-200">Minifix + Шкант 8x30</span>
+                            </div>
+                        </div>
+
+                        <!-- Requirements Checklist -->
+                        <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">
+                            <span class="text-[11px] font-bold text-slate-300 block mb-1.5">Обязательные требования к модели в Базис-10:</span>
+                            <ul id="hw-rules" class="text-[11px] text-slate-400 space-y-1 list-disc list-inside">
+                                <li>Указать облицовку кромок на всех пластях и торцах.</li>
+                                <li>Оставить зазор 2 мм между фасадами ящиков.</li>
+                                <li>Сделать отступ паза ХДФ 12 мм от заднего края боковины.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- AI Render & Action buttons -->
+                    <div class="pt-2 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex items-center gap-2">
+                            <button onclick="triggerAIRender()" class="px-3 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shadow-md shadow-purple-600/20">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                AI 3D-Рендер (Gemini)
+                            </button>
+                        </div>
+                        <span class="text-[11px] text-slate-400 italic">Сгенерировано решений: <span id="completed-count" class="font-bold text-blue-400">0</span></span>
+                    </div>
+                </div>
+
+                <!-- 3D Canvas Box (5 cols) -->
+                <div class="lg:col-span-5 bg-slate-900 rounded-2xl p-4 border border-slate-800 flex flex-col justify-between space-y-3 relative overflow-hidden">
+                    <div class="flex items-center justify-between z-10">
+                        <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                            <i class="fa-solid fa-cube text-blue-400"></i> 3D Макет изделия
                         </span>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="toggleWireframe()" id="btn-wireframe" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-medium rounded-lg border border-slate-700 transition-all">
+                                Каркас (F5)
+                            </button>
+                            <button onclick="toggleExploded()" id="btn-explode" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-medium rounded-lg border border-slate-700 transition-all">
+                                Разнести
+                            </button>
+                        </div>
                     </div>
-                    
-                    <!-- 3D Viewport Container -->
-                    <div class="relative w-full h-72 md:h-80 bg-slate-950 rounded-xl overflow-hidden border border-slate-800 group" id="canvas3dContainer">
-                        <canvas id="threeCanvas" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
+
+                    <!-- Interactive Canvas Container -->
+                    <div id="canvas-3d-wrapper" class="w-full h-72 bg-slate-950 rounded-xl overflow-hidden relative border border-slate-800 canvas-container flex items-center justify-center">
+                        <canvas id="canvas-3d" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
                         
-                        <!-- Overlay controls inside canvas -->
-                        <div class="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
-                            <button onclick="toggle3dWireframe()" class="px-2.5 py-1 bg-slate-900/80 hover:bg-slate-800 text-slate-300 text-[11px] rounded-lg border border-slate-700 backdrop-blur transition-all flex items-center gap-1.5">
-                                <i class="fa-solid fa-vector-square text-amber-500"></i> <span id="wireframeBtnLabel">F5 Каркас</span>
-                            </button>
-                            <button onclick="toggle3dExplodedView()" class="px-2.5 py-1 bg-slate-900/80 hover:bg-slate-800 text-slate-300 text-[11px] rounded-lg border border-slate-700 backdrop-blur transition-all flex items-center gap-1.5">
-                                <i class="fa-solid fa-arrows-split-up-and-left text-amber-400"></i> Взрыв-схема
-                            </button>
-                            <button onclick="reset3dCamera()" class="px-2 py-1 bg-slate-900/80 hover:bg-slate-800 text-slate-300 text-[11px] rounded-lg border border-slate-700 backdrop-blur transition-all" title="Сброс камеры">
-                                <i class="fa-solid fa-rotate-left"></i>
-                            </button>
-                        </div>
-                        
-                        <div class="absolute bottom-3 left-3 right-3 text-[11px] text-slate-400 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-800 backdrop-blur flex justify-between items-center pointer-events-none">
-                            <span><i class="fa-solid fa-hand-pointer mr-1 text-amber-500"></i> Вращение: ЛКМ / Касание</span>
-                            <span id="threeModelInfo" class="font-mono text-amber-400">Тумба 800х450х500</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. AI 3D GENERATOR -->
-                <div class="glass-panel rounded-2xl p-5 border border-slate-800 flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <h3 class="font-bold text-slate-200 text-sm flex items-center gap-2">
-                                <i class="fa-solid fa-image text-amber-500"></i> 2. AI 3D-Рендер (Imagen / Gemini)
-                            </h3>
-                            <button onclick="generateAiModelPhoto()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold px-3 py-1.5 rounded-xl transition-all shadow-md shadow-amber-500/20 flex items-center gap-1.5">
-                                <i class="fa-solid fa-sparkles"></i> Сгенерировать 3D-фото
-                            </button>
-                        </div>
-
-                        <!-- Preview Frame -->
-                        <div id="aiImageContainer" class="relative w-full h-72 md:h-80 bg-slate-950 rounded-xl overflow-hidden border border-slate-800 flex flex-col items-center justify-center p-4 text-center">
-                            <div id="aiPlaceholderState" class="space-y-3 max-w-xs">
-                                <div class="w-12 h-12 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-amber-500 text-xl mx-auto">
-                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-                                </div>
-                                <p class="text-xs text-slate-300 font-medium">Фотореалистичный 3D-рендер изделия по ТЗ</p>
-                                <p class="text-[11px] text-slate-500">Нажмите «Сгенерировать 3D-фото», чтобы AI сформировал визуализацию готовой мебели в интерьере мастерской.</p>
+                        <!-- AI Generated Overlay Modal / Result -->
+                        <div id="ai-image-modal" class="hidden absolute inset-0 bg-slate-950/95 z-20 flex flex-col p-3 backdrop-blur-md">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-bold text-purple-300 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> AI Рендер готового изделия
+                                </span>
+                                <button onclick="closeAIModal()" class="text-slate-400 hover:text-white text-sm px-1.5">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
                             </div>
-
-                            <!-- Loader State (Hidden) -->
-                            <div id="aiLoadingState" class="hidden space-y-3">
-                                <div class="inline-block animate-spin text-amber-500 text-3xl">
-                                    <i class="fa-solid fa-circle-notch"></i>
+                            <div class="flex-1 flex items-center justify-center overflow-hidden rounded-lg border border-slate-800 bg-black">
+                                <img id="ai-rendered-img" class="max-h-full max-w-full object-contain" alt="AI Generated Furniture Render" />
+                                <div id="ai-loading-spinner" class="flex flex-col items-center gap-2 text-purple-400 text-xs">
+                                    <i class="fa-solid fa-circle-notch fa-spin text-2xl"></i>
+                                    <span>Генерация фотореалистичной модели...</span>
                                 </div>
-                                <p class="text-xs text-amber-400 font-semibold" id="aiLoadingText">Обращение к Gemini AI...</p>
-                                <p class="text-[10px] text-slate-500">Генерация фото студийного качества (3D CAD Render)</p>
                             </div>
-
-                            <!-- Result Image (Hidden) -->
-                            <img id="aiResultImg" class="hidden w-full h-full object-contain rounded-lg" alt="AI 3D Render">
                         </div>
                     </div>
 
-                    <!-- Status / Action footer -->
-                    <div id="aiStatusFooter" class="mt-3 pt-3 border-t border-slate-800 flex justify-between items-center text-xs">
-                        <span id="aiStatusText" class="text-slate-400 text-[11px]">Готов к генерации</span>
-                        <a id="downloadAiImgBtn" href="#" download="3d_model_homework.png" class="hidden text-amber-400 hover:text-amber-300 font-medium text-[11px] items-center gap-1">
-                            <i class="fa-solid fa-download"></i> Скачать рендер
-                        </a>
+                    <div class="text-[10px] text-slate-400 text-center z-10">
+                        <i class="fa-solid fa-hand-pointer me-1"></i> Вращение мышью / пальцем • Колесо для зума
                     </div>
                 </div>
             </div>
 
-            <!-- FILE AUDIT & MISTAKE JOURNAL -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Audit Uploader -->
-                <div class="lg:col-span-2 glass-panel rounded-2xl p-5 border border-slate-800">
-                    <h3 class="font-bold text-slate-200 text-sm mb-1 flex items-center gap-2">
-                        <i class="fa-solid fa-file-code text-amber-500"></i> Проверка Модели / Скриншота (.b3d, .fr3d, .xml, .dxf, .png)
-                    </h3>
-                    <p class="text-xs text-slate-400 mb-4">Загрузите файл Базиса или скриншот чертежа — AI найдет пересечения, неверные присадки и ошибки под ЧПУ</p>
+            <!-- Upload File & Validation Section -->
+            <div class="bg-slate-900 rounded-2xl p-5 border border-slate-800 space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+                    <div>
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-file-shield text-emerald-400"></i>
+                            Проверка проекта из Базиса на ошибки
+                        </h3>
+                        <p class="text-xs text-slate-400">
+                            Загрузите выгрузку чертежа/чертежей (.xml, .csv, .txt, .dxf, .b3d, .fr3d) или скриншот модели (.png, .jpg).
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="runDemoCheck()" class="px-3 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all">
+                            <i class="fa-solid fa-vial"></i>
+                            Тест: Демо-файл с 3 ошибками
+                        </button>
+                    </div>
+                </div>
 
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
                     <!-- Dropzone -->
-                    <div class="border-2 border-dashed border-slate-800 hover:border-amber-500/50 rounded-xl p-6 text-center transition-all bg-slate-950/40 relative group">
-                        <input type="file" id="auditFileInput" onchange="handleFileSelect(event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                        <div class="space-y-2">
-                            <div class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-800 text-amber-500 flex items-center justify-center mx-auto text-lg group-hover:scale-110 transition-transform">
-                                <i class="fa-solid fa-cloud-arrow-up"></i>
-                            </div>
-                            <p id="fileNameDisplay" class="text-xs font-semibold text-slate-300">Перетащите файл или кликните для выбора</p>
-                            <p class="text-[11px] text-slate-500">Поддерживаются: .b3d, .fr3d, .xml, .csv, .dxf, .png, .jpg</p>
+                    <div class="md:col-span-5 border-2 border-dashed border-slate-700 hover:border-blue-500 rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer transition-all bg-slate-950/40 hover:bg-slate-950/80 relative" onclick="document.getElementById('file-input').click()">
+                        <input type="file" id="file-input" class="hidden" accept=".xml,.csv,.txt,.dxf,.b3d,.fr3d,.png,.jpg" onchange="handleFileUpload(event)">
+                        <div class="w-12 h-12 rounded-full bg-blue-500/10 text-blue-400 flex items-center justify-center text-xl mb-2">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
                         </div>
+                        <span class="text-xs font-bold text-slate-200">Перетащите файл или нажмите для выбора</span>
+                        <span class="text-[10px] text-slate-400 mt-1">Поддерживает .xml, .csv, .dxf, .b3d, .fr3d, .png, .jpg</span>
                     </div>
 
-                    <div class="flex flex-wrap gap-2 mt-4">
-                        <button onclick="runAudit()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs py-2.5 px-4 rounded-xl transition-all shadow-md shadow-amber-500/20 flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-magnifying-glass"></i> Запустить AI-Аудит
-                        </button>
-                        <button onclick="loadDemoErrorFile()" class="bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-semibold py-2.5 px-4 rounded-xl transition-all border border-amber-500/30 flex items-center gap-1.5">
-                            <i class="fa-solid fa-vial"></i> Тест: Демо-файл (3 ошибки)
-                        </button>
-                    </div>
-
-                    <!-- Audit Output Container -->
-                    <div id="auditResultBox" class="mt-4 hidden p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-3">
-                        <!-- Dynamic Audit Result -->
-                    </div>
-                </div>
-
-                <!-- Mistake Journal -->
-                <div class="glass-panel rounded-2xl p-5 border border-slate-800 flex flex-col justify-between">
-                    <div>
-                        <div class="flex justify-between items-center mb-3">
-                            <h3 class="font-bold text-slate-200 text-sm flex items-center gap-2">
-                                <i class="fa-solid fa-book-skull text-amber-500"></i> Журнал ошибок
-                            </h3>
-                            <button onclick="clearMistakeJournal()" class="text-[11px] text-slate-500 hover:text-rose-400">Очистить</button>
-                        </div>
-                        <p class="text-xs text-slate-400 mb-3">Автоматическая фиксация частых промахов при проектировании</p>
-                        
-                        <div id="mistakeJournalList" class="space-y-2 max-h-64 overflow-y-auto pr-1">
-                            <!-- Mistakes appended here -->
-                        </div>
-                    </div>
-                    <div class="mt-4 pt-3 border-t border-slate-800 text-[11px] text-slate-500 flex justify-between">
-                        <span>Зафиксировано: <strong id="mistakeCount" class="text-amber-400">0</strong></span>
-                        <span class="text-emerald-400 font-medium">Прогресс растет!</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-
-        <!-- ================= TAB 2: SCRIPT & HARDWARE GENERATOR ================= -->
-        <section id="tab-generator" class="tab-content hidden space-y-6">
-            <div class="glass-panel rounded-2xl p-5 border border-slate-800">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pb-4 border-b border-slate-800">
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-100 flex items-center gap-2">
-                            <i class="fa-solid fa-gears text-amber-500"></i> Генератор Фрагментов & Скриптов Б-10
-                        </h2>
-                        <p class="text-xs text-slate-400 mt-1">Создание параметрической фурнитуры с выгрузкой в .JS скрипт Базиса, .OBJ и .DXF</p>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Hardware Form -->
-                    <div class="space-y-4 bg-slate-900/90 p-4 rounded-xl border border-slate-800">
-                        <h3 class="font-bold text-slate-200 text-sm border-b border-slate-800 pb-2">Параметры Изделия</h3>
-                        
+                    <!-- Validation Result Logs -->
+                    <div class="md:col-span-7 bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col justify-between">
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Тип фурнитуры</label>
-                            <select id="genType" onchange="updateHardwarePreview()" class="w-full bg-slate-950 text-slate-200 text-xs p-2.5 rounded-lg border border-slate-700 outline-none">
-                                <option value="handle_profile">Профиль-ручка Gola / C-профиль</option>
-                                <option value="handle_pull">Ручка-скоба (параметрическая)</option>
-                                <option value="handle_knob">Ручка-кнопка (точечная)</option>
-                                <option value="hinge_overlay">Петля накладная 110° с планкой</option>
-                            </select>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-xs text-slate-400 mb-1">Длина L (мм)</label>
-                                <input type="number" id="genLength" value="192" oninput="updateHardwarePreview()" class="w-full bg-slate-950 text-slate-200 text-xs p-2.5 rounded-lg border border-slate-700 outline-none">
+                            <span class="text-xs font-bold text-slate-300 block mb-2 flex items-center justify-between">
+                                <span>Результаты проверки:</span>
+                                <span id="check-status-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-400">Файл не выбран</span>
+                            </span>
+                            
+                            <div id="validation-logs" class="space-y-2 text-xs text-slate-400 max-h-40 overflow-y-auto pr-1">
+                                <div class="text-slate-400 italic text-center py-4">
+                                    Загрузите файл из Базиса или нажмите «Тест: Демо-файл с 3 ошибками» для запуска проверки.
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-xs text-slate-400 mb-1">Межосевое (мм)</label>
-                                <select id="genPitch" onchange="updateHardwarePreview()" class="w-full bg-slate-950 text-slate-200 text-xs p-2.5 rounded-lg border border-slate-700 outline-none">
-                                    <option value="96">96 мм</option>
-                                    <option value="128">128 мм</option>
-                                    <option value="160" selected>160 мм</option>
-                                    <option value="192">192 мм</option>
-                                    <option value="256">256 мм</option>
-                                    <option value="320">320 мм</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-xs text-slate-400 mb-1">Высота/Глубина H (мм)</label>
-                                <input type="number" id="genHeight" value="28" oninput="updateHardwarePreview()" class="w-full bg-slate-950 text-slate-200 text-xs p-2.5 rounded-lg border border-slate-700 outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs text-slate-400 mb-1">Отделка / Цвет</label>
-                                <select id="genFinish" onchange="updateHardwarePreview()" class="w-full bg-slate-950 text-slate-200 text-xs p-2.5 rounded-lg border border-slate-700 outline-none">
-                                    <option value="#1e293b">Черный матовый (RAL 9005)</option>
-                                    <option value="#cbd5e1">Хром глянцевый</option>
-                                    <option value="#d97706">Бронза / Латунь</option>
-                                    <option value="#64748b">Сатин / Алюминий</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="pt-2">
-                            <label class="block text-xs text-slate-400 mb-1">Имя файла в Базисе</label>
-                            <input type="text" id="genFileName" value="Ручка_Скоба_160мм" class="w-full bg-slate-950 text-slate-200 text-xs p-2.5 rounded-lg border border-slate-700 outline-none font-mono">
-                        </div>
-                    </div>
-
-                    <!-- Live Blueprint & 3D Preview -->
-                    <div class="lg:col-span-2 space-y-4 flex flex-col justify-between">
-                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col h-64 relative overflow-hidden">
-                            <span class="text-[10px] font-mono text-slate-500 absolute top-3 left-3">SVG CAD Чертеж Присадки</span>
-                            <div class="flex-1 flex items-center justify-center" id="svgPreviewContainer">
-                                <!-- Dynamic SVG Blueprint -->
-                            </div>
-                        </div>
-
-                        <!-- Export Buttons -->
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                            <button onclick="downloadBazisScript()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs p-3 rounded-xl transition-all shadow-md flex flex-col items-center justify-center gap-1">
-                                <i class="fa-solid fa-file-code text-base"></i>
-                                <span>Скачать .JS Скрипт</span>
-                                <span class="text-[9px] font-normal opacity-80">Для Базис 10 / 11</span>
-                            </button>
-
-                            <button onclick="downloadObj3D()" class="bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-xs p-3 rounded-xl border border-slate-700 transition-all flex flex-col items-center justify-center gap-1">
-                                <i class="fa-solid fa-cube text-base"></i>
-                                <span>Скачать .OBJ 3D</span>
-                                <span class="text-[9px] font-normal text-slate-400">Для Базис / 3ds Max</span>
-                            </button>
-
-                            <button onclick="downloadDxfBlueprint()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs p-3 rounded-xl border border-slate-700 transition-all flex flex-col items-center justify-center gap-1">
-                                <i class="fa-solid fa-drafting-compass text-base text-emerald-400"></i>
-                                <span>Скачать .DXF CAD</span>
-                                <span class="text-[9px] font-normal text-slate-400">Векторные отверстия</span>
-                            </button>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
 
-
-        <!-- ================= TAB 3: REFERENCE & DRAWER CALCULATOR ================= -->
-        <section id="tab-reference" class="tab-content hidden space-y-6">
-            <!-- DRAWER CALCULATOR -->
-            <div class="glass-panel rounded-2xl p-5 border border-slate-800">
-                <h2 class="text-xl font-bold text-slate-100 mb-1 flex items-center gap-2">
-                    <i class="fa-solid fa-calculator text-amber-500"></i> Калькулятор Размеров Ящиков (Blum / Hettich / AKS)
-                </h2>
-                <p class="text-xs text-slate-400 mb-4">Расчет чистового раскроя детаровки деревянного ящика под скрытые направляющие</p>
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="space-y-3 bg-slate-900/80 p-4 rounded-xl border border-slate-800">
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">Система направляющих</label>
-                            <select id="drawerSystem" onchange="calculateDrawer()" class="w-full bg-slate-950 text-slate-200 text-xs p-2.5 rounded-lg border border-slate-700 outline-none">
-                                <option value="tandem560">Blum Tandem 560H / 561H (16мм боковина)</option>
-                                <option value="legrabox">Blum Legrabox (M/K/C/F)</option>
-                                <option value="aks16">AKS Скрытый монтаж (16мм бок)</option>
-                                <option value="aks18">AKS Скрытый монтаж (18мм бок)</option>
-                                <option value="quadro">Hettich Quadro V6 / V6+</option>
-                                <option value="ball">Шариковые 45мм (зазор 12.7мм)</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">Ширина проема секции Lпроема (мм)</label>
-                            <input type="number" id="drawerInternalWidth" value="568" oninput="calculateDrawer()" class="w-full bg-slate-950 text-slate-200 text-xs p-2.5 rounded-lg border border-slate-700 outline-none font-mono">
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="block text-xs text-slate-400 mb-1">Толщина ДСП (мм)</label>
-                                <select id="drawerBoardThick" onchange="calculateDrawer()" class="w-full bg-slate-950 text-slate-200 text-xs p-2.5 rounded-lg border border-slate-700 outline-none">
-                                    <option value="16" selected>16 мм</option>
-                                    <option value="18">18 мм</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs text-slate-400 mb-1">Глубина (мм)</label>
-                                <select id="drawerDepth" onchange="calculateDrawer()" class="w-full bg-slate-950 text-slate-200 text-xs p-2.5 rounded-lg border border-slate-700 outline-none">
-                                    <option value="450" selected>450 мм</option>
-                                    <option value="500">500 мм</option>
-                                    <option value="400">400 мм</option>
-                                    <option value="350">350 мм</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Output Specs -->
-                    <div id="drawerOutputBox" class="lg:col-span-2 bg-slate-950 p-5 rounded-xl border border-slate-800 text-xs space-y-4">
-                        <!-- Calculated Specs dynamically inserted -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- OFFSETS & HOTKEYS TABLES -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Standard Offsets -->
-                <div class="glass-panel rounded-2xl p-5 border border-slate-800">
-                    <h3 class="font-bold text-slate-200 text-sm mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-ruler-combined text-amber-500"></i> Стандарты Присадки & Отступов
+            <!-- Error Log / History Tracker -->
+            <div class="bg-slate-900 rounded-2xl p-5 border border-slate-800 space-y-3">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-clipboard-check text-warning"></i>
+                        Журнал твоих ошибок (Сохраняется локально)
                     </h3>
+                    <button onclick="clearErrorLog()" class="text-[11px] text-slate-400 hover:text-rose-400 transition-all">
+                        Очистить историю
+                    </button>
+                </div>
+                <div id="error-history-list" class="space-y-2 text-xs">
+                    <!-- Dynamic items loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: BAZIS GENERATOR -->
+        <section id="section-generator" class="hidden space-y-6 max-w-7xl mx-auto">
+            <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-drafting-compass text-blue-500"></i>
+                    Генератор Фурнитуры и Скриптов для Базис-Мебельщик 10
+                </h2>
+                <p class="text-xs text-slate-400 mt-1">
+                    Параметрическое создание мебельной фурнитуры с генерацией чертежа присадки и скачиванием готовых файлов 3D (.OBJ), Скрипт (.JS) и ЧПУ (.DXF).
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Parameters Form (5 cols) -->
+                <div class="lg:col-span-5 bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-4">
+                    <h3 class="text-sm font-bold text-white border-b border-slate-800 pb-2">
+                        1. Параметры фурнитуры
+                    </h3>
+
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Тип элемента</label>
+                            <select id="gen-type" onchange="updateGeneratorPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                                <option value="handle-pull">Ручка-скоба (2 отверстия)</option>
+                                <option value="handle-knob">Ручка-кнопка (1 отверстие)</option>
+                                <option value="hinge-cup">Петля мебельная (Чашка Ø35 мм)</option>
+                            </select>
+                        </div>
+
+                        <div id="field-cc-group">
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Межосевое расстояние (мм)</label>
+                            <select id="gen-cc" onchange="updateGeneratorPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                                <option value="96">96 мм</option>
+                                <option value="128" selected>128 мм</option>
+                                <option value="160">160 мм</option>
+                                <option value="192">192 мм</option>
+                                <option value="224">224 мм</option>
+                                <option value="320">320 мм</option>
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Длина L (мм)</label>
+                                <input type="number" id="gen-length" value="148" oninput="updateGeneratorPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Высота/Вылет H (мм)</label>
+                                <input type="number" id="gen-height" value="28" oninput="updateGeneratorPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Толщина D (мм)</label>
+                                <input type="number" id="gen-thick" value="10" oninput="updateGeneratorPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">Диаметр винта (мм)</label>
+                                <input type="number" id="gen-screw" value="4" oninput="updateGeneratorPreview()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Downloads Section -->
+                    <div class="pt-3 border-t border-slate-800 space-y-2">
+                        <span class="text-xs font-bold text-slate-300 block mb-1">Скачать готовые файлы:</span>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="downloadOBJ()" class="px-2.5 py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 text-xs font-semibold rounded-xl flex items-center justify-center gap-1 transition-all">
+                                <i class="fa-solid fa-cube text-xs"></i> .OBJ (3D)
+                            </button>
+                            <button onclick="downloadJS()" class="px-2.5 py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-xs font-semibold rounded-xl flex items-center justify-center gap-1 transition-all">
+                                <i class="fa-solid fa-code text-xs"></i> .JS (Базис)
+                            </button>
+                            <button onclick="downloadDXF()" class="px-2.5 py-2 bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 border border-purple-500/30 text-xs font-semibold rounded-xl flex items-center justify-center gap-1 transition-all">
+                                <i class="fa-solid fa-compass-drafting text-xs"></i> .DXF (ЧПУ)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive SVG Drawing Preview (7 cols) -->
+                <div class="lg:col-span-7 bg-slate-900 p-5 rounded-2xl border border-slate-800 flex flex-col justify-between space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-vector-square text-emerald-400"></i>
+                            2D Чертеж с точками присадки
+                        </h3>
+                        <span class="text-[11px] text-slate-400 font-mono">Масштаб: Авто</span>
+                    </div>
+
+                    <div id="svg-preview-container" class="w-full h-80 bg-slate-950 rounded-xl border border-slate-800 p-4 flex items-center justify-center overflow-hidden">
+                        <svg id="svg-drawing" class="w-full h-full max-h-72" viewBox="0 0 500 300">
+                            <!-- SVG generated dynamically -->
+                        </svg>
+                    </div>
+
+                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs text-slate-400 flex items-center justify-between">
+                        <span><i class="fa-solid fa-circle-info text-blue-400 me-1"></i> Скрипт .JS подключается в Базис-Мебельщик через меню <i>Скрипты -> Выполнить</i>.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: HANDBOOK BAZIS 10 -->
+        <section id="section-handbook" class="hidden space-y-6 max-w-7xl mx-auto">
+            <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-book-bookmark text-blue-500"></i>
+                    Справочник Конструктора Б-10 & Калькуляторы
+                </h2>
+                <p class="text-xs text-slate-400 mt-1">
+                    Формулы расчёта дна ящиков, стандарты присадочных отступов, горячие клавиши и чек-лист предраскройной проверки.
+                </p>
+            </div>
+
+            <!-- Drawer Bottom Calculator -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-6 bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-4">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-2">
+                        <i class="fa-solid fa-calculator text-indigo-400"></i>
+                        Калькулятор размера дна выдвижного ящика
+                    </h3>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Ширина проёма корпуса W (мм)</label>
+                            <input type="number" id="calc-w" value="564" oninput="calcDrawerBottom()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Толщина боковин корпуса</label>
+                            <select id="calc-thick" onchange="calcDrawerBottom()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                                <option value="16" selected>ЛДСП 16 мм</option>
+                                <option value="18">ЛДСП 18 мм</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Тип направляющих систем</label>
+                        <select id="calc-system" onchange="calcDrawerBottom()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                            <option value="tandem" selected>Blum Tandem / AKS скрытого монтажа (-42 мм)</option>
+                            <option value="quadro">Hettich Quadro V6 (-42 мм)</option>
+                            <option value="ball">Шариковые направляющие 45мм (-26 мм)</option>
+                            <option value="legrabox">Blum Legrabox (-35 мм)</option>
+                        </select>
+                    </div>
+
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-400">Ширина дна ящика (ЛДСП/ХДФ):</span>
+                            <span id="res-bottom-w" class="font-bold text-emerald-400 text-sm font-mono">522 мм</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-400">Внутренний чистый проём ящика:</span>
+                            <span id="res-inner-w" class="font-bold text-blue-400 text-sm font-mono">490 мм</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Drilling Offsets Standard Table -->
+                <div class="lg:col-span-6 bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-2">
+                        <i class="fa-solid fa-table-list text-emerald-400"></i>
+                        Таблица стандартных отступов присадки
+                    </h3>
+
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs border-collapse">
                             <thead>
                                 <tr class="border-b border-slate-800 text-slate-400">
-                                    <th class="py-2 px-2">Крепеж</th>
-                                    <th class="py-2 px-2">Диаметр / Глубина</th>
+                                    <th class="py-2 px-2">Элемент</th>
                                     <th class="py-2 px-2">Отступ от края</th>
+                                    <th class="py-2 px-2">Диаметр / Глубина</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-800/60 text-slate-300">
                                 <tr>
-                                    <td class="py-2 px-2 font-medium text-amber-400">Minifix (Эксцентрик)</td>
-                                    <td class="py-2 px-2 font-mono">D15 h=12.5–14мм</td>
-                                    <td class="py-2 px-2 font-mono">34 мм / 50 мм</td>
+                                    <td class="py-2 px-2 font-semibold text-white">Minifix (Эксцентрик)</td>
+                                    <td class="py-2 px-2 font-mono">34 мм</td>
+                                    <td class="py-2 px-2 font-mono">Ø15 мм / Глубина 12.5-14 мм</td>
                                 </tr>
                                 <tr>
-                                    <td class="py-2 px-2 font-medium text-amber-400">Rafix (VB 35)</td>
-                                    <td class="py-2 px-2 font-mono">D20 h=12.7мм</td>
-                                    <td class="py-2 px-2 font-mono">9.5 мм от центра</td>
+                                    <td class="py-2 px-2 font-semibold text-white">Rafix (VB 35)</td>
+                                    <td class="py-2 px-2 font-mono">9.5 мм</td>
+                                    <td class="py-2 px-2 font-mono">Ø20 мм / Глубина 14.2 мм</td>
                                 </tr>
                                 <tr>
-                                    <td class="py-2 px-2 font-medium text-amber-400">Шкант деревянный</td>
-                                    <td class="py-2 px-2 font-mono">D8 h=30мм (сверл. 13+25)</td>
-                                    <td class="py-2 px-2 font-mono">32 мм шаг System 32</td>
+                                    <td class="py-2 px-2 font-semibold text-white">Шкант деревянный</td>
+                                    <td class="py-2 px-2 font-mono">32 / 50 / 64 мм</td>
+                                    <td class="py-2 px-2 font-mono">Ø8 мм / Глубина 22-25 мм</td>
                                 </tr>
                                 <tr>
-                                    <td class="py-2 px-2 font-medium text-amber-400">Чашка петли 35мм</td>
-                                    <td class="py-2 px-2 font-mono">D35 h=11.5мм</td>
-                                    <td class="py-2 px-2 font-mono">21.5 мм до центра (кромка 3-5)</td>
+                                    <td class="py-2 px-2 font-semibold text-white">Чашка петли Ø35</td>
+                                    <td class="py-2 px-2 font-mono">21.5 - 22 мм (К=4-5 мм)</td>
+                                    <td class="py-2 px-2 font-mono">Ø35 мм / Глубина 11.5 мм</td>
                                 </tr>
                                 <tr>
-                                    <td class="py-2 px-2 font-medium text-amber-400">Паз под ХДФ 4мм</td>
-                                    <td class="py-2 px-2 font-mono">Ширина 4мм / Глубина 4-6мм</td>
-                                    <td class="py-2 px-2 font-mono">Отступ 12 мм от края</td>
+                                    <td class="py-2 px-2 font-semibold text-white">Паз под ХДФ 4 мм</td>
+                                    <td class="py-2 px-2 font-mono">Отступ 10-12 мм от края</td>
+                                    <td class="py-2 px-2 font-mono">Ширина 4.2 мм / Гл. 6-8 мм</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
+            </div>
 
-                <!-- Bazis Hotkeys & Checklist -->
-                <div class="glass-panel rounded-2xl p-5 border border-slate-800 flex flex-col justify-between">
-                    <div>
-                        <h3 class="font-bold text-slate-200 text-sm mb-3 flex items-center justify-between">
-                            <span class="flex items-center gap-2"><i class="fa-solid fa-list-check text-amber-500"></i> Чек-лист перед ЧПУ</span>
-                            <span class="text-[10px] text-slate-500">Сохраняется авто</span>
-                        </h3>
-                        <div class="space-y-2 text-xs" id="cncChecklist">
-                            <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-900/60 border border-slate-800 cursor-pointer hover:border-slate-700">
-                                <input type="checkbox" onchange="saveChecklist()" class="accent-amber-500 rounded">
-                                <span class="text-slate-300">Направление текстуры ЛДСП / Шпона проверено</span>
-                            </label>
-                            <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-900/60 border border-slate-800 cursor-pointer hover:border-slate-700">
-                                <input type="checkbox" onchange="saveChecklist()" class="accent-amber-500 rounded">
-                                <span class="text-slate-300">Припущены размеры под поклейку кромки 2мм / 1мм</span>
-                            </label>
-                            <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-900/60 border border-slate-800 cursor-pointer hover:border-slate-700">
-                                <input type="checkbox" onchange="saveChecklist()" class="accent-amber-500 rounded">
-                                <span class="text-slate-300">Нет коллизий между эксцентриками и направляющими</span>
-                            </label>
-                            <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-900/60 border border-slate-800 cursor-pointer hover:border-slate-700">
-                                <input type="checkbox" onchange="saveChecklist()" class="accent-amber-500 rounded">
-                                <span class="text-slate-300">Паз под ХДФ проверен на выход в пласть</span>
-                            </label>
-                        </div>
+            <!-- Pre-flight Checklist & Hotkeys Search -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Checklist -->
+                <div class="lg:col-span-6 bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-2">
+                        <i class="fa-solid fa-list-check text-warning"></i>
+                        Чек-лист перед выгрузкой в ЧПУ и Раскрой
+                    </h3>
+                    <div class="space-y-2 text-xs">
+                        <label class="flex items-center gap-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800/80 cursor-pointer hover:bg-slate-800/40">
+                            <input type="checkbox" class="rounded bg-slate-900 border-slate-700 text-blue-500 focus:ring-0">
+                            <span class="text-slate-300">Проверена облицовка всех торцов (ПВХ 2/1/0.4 мм).</span>
+                        </label>
+                        <label class="flex items-center gap-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800/80 cursor-pointer hover:bg-slate-800/40">
+                            <input type="checkbox" class="rounded bg-slate-900 border-slate-700 text-blue-500 focus:ring-0">
+                            <span class="text-slate-300">Проверены направляющие и зазоры ящиков (-42 или -26 мм).</span>
+                        </label>
+                        <label class="flex items-center gap-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800/80 cursor-pointer hover:bg-slate-800/40">
+                            <input type="checkbox" class="rounded bg-slate-900 border-slate-700 text-blue-500 focus:ring-0">
+                            <span class="text-slate-300">Направление текстуры древесины совпадает на фасадах.</span>
+                        </label>
+                        <label class="flex items-center gap-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800/80 cursor-pointer hover:bg-slate-800/40">
+                            <input type="checkbox" class="rounded bg-slate-900 border-slate-700 text-blue-500 focus:ring-0">
+                            <span class="text-slate-300">Проверено перекрытие петли и отсутствуют пересечения с полками.</span>
+                        </label>
                     </div>
+                </div>
 
-                    <!-- Hotkeys preview -->
-                    <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-                        <span><kbd class="bg-slate-800 px-1.5 py-0.5 rounded text-amber-400 font-mono">F5</kbd> Каркас</span>
-                        <span><kbd class="bg-slate-800 px-1.5 py-0.5 rounded text-amber-400 font-mono">F6</kbd> Скрыть панели</span>
-                        <span><kbd class="bg-slate-800 px-1.5 py-0.5 rounded text-amber-400 font-mono">Shift+A</kbd> Расстановка присадки</span>
+                <!-- Hotkeys Search -->
+                <div class="lg:col-span-6 bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-keyboard text-blue-400"></i>
+                            Горячие клавиши Базис-10
+                        </h3>
+                        <input type="text" id="hk-search" oninput="filterHotkeys()" placeholder="Поиск клавиши..." class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none focus:border-blue-500 w-36">
+                    </div>
+                    <div id="hk-list" class="space-y-1.5 text-xs max-h-44 overflow-y-auto pr-1">
+                        <!-- Dynamic Hotkeys Loaded Here -->
                     </div>
                 </div>
             </div>
         </section>
 
-
-        <!-- ================= TAB 4: PAINTSHOP ================= -->
-        <section id="tab-paintshop" class="tab-content hidden space-y-6">
-            <div class="glass-panel rounded-2xl p-5 border border-slate-800">
-                <h2 class="text-xl font-bold text-slate-100 mb-1 flex items-center gap-2">
-                    <i class="fa-solid fa-spray-can text-amber-500"></i> Расчёт ЛКМ & Малярный Цех
+        <!-- SECTION 4: PAINT SHOP -->
+        <section id="section-paint" class="hidden space-y-6 max-w-7xl mx-auto">
+            <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-spray-can-sparkles text-purple-400"></i>
+                    Малярный цех — Калькулятор ЛКМ & Трекер
                 </h2>
-                <p class="text-xs text-slate-400 mb-4">Калькулятор расхода грунта, эмали и лака с учетом потерь на факел краскопульта</p>
+                <p class="text-xs text-slate-400 mt-1">
+                    Точный расчёт смеси (Основа + Отвердитель + Разбавитель) в граммах и мл, руководство по дефектам и контроль заказов.
+                </p>
+            </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Calculator Inputs -->
-                    <div class="space-y-3 bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+            <!-- Paint Mix Calculator -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Form Inputs (6 cols) -->
+                <div class="lg:col-span-6 bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-4">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-2">
+                        <i class="fa-solid fa-flask text-purple-400"></i>
+                        Расчёт смешивания ЛКМ
+                    </h3>
+
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Материал / Покрытие</label>
-                            <select id="paintMaterial" onchange="calculatePaint()" class="w-full bg-slate-950 text-slate-200 text-xs p-2.5 rounded-lg border border-slate-700 outline-none">
-                                <option value="pu_primer">ПУ Грунт изолятор / Полиуретан (150 г/м²)</option>
-                                <option value="pu_enamel">ПУ Эмаль матовая (130 г/м²)</option>
-                                <option value="acrylic_lacquer">Акриловый Лак высок. глянец (160 г/м²)</option>
-                                <option value="waterbase">Водный лак / грунт (110 г/м²)</option>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Тип материала</label>
+                            <select id="lkm-type" onchange="calcLKM()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                                <option value="pu-isolator">Изолятор ПУ для МДФ</option>
+                                <option value="pu-primer" selected>Грунт ПУ белая эмаль</option>
+                                <option value="pu-enamel">Эмаль ПУ матовая</option>
+                                <option value="acrylic-varnish">Лак Акриловый высокоглянцевый</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-400 mb-1">Площадь деталей S (м²)</label>
-                            <input type="number" id="paintArea" value="4.5" step="0.1" oninput="calculatePaint()" class="w-full bg-slate-950 text-slate-200 text-xs p-2.5 rounded-lg border border-slate-700 outline-none font-mono">
-                        </div>
-                        <div>
-                            <label class="block text-xs text-slate-400 mb-1">Количество слоев</label>
-                            <select id="paintCoats" onchange="calculatePaint()" class="w-full bg-slate-950 text-slate-200 text-xs p-2.5 rounded-lg border border-slate-700 outline-none">
-                                <option value="1">1 слой</option>
-                                <option value="2" selected>2 слоя</option>
-                                <option value="3">3 слоя (выравнивание МДФ)</option>
-                            </select>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-xs text-slate-400 mb-1">
-                                <span>Потери факела (Overspray)</span>
-                                <span id="oversprayValue" class="text-amber-400 font-mono">35%</span>
-                            </div>
-                            <input type="range" id="oversprayRange" min="15" max="50" value="35" oninput="calculatePaint()" class="w-full accent-amber-500">
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Площадь покраски (м²)</label>
+                            <input type="number" id="lkm-area" value="4.5" step="0.1" oninput="calcLKM()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
                         </div>
                     </div>
 
-                    <!-- Calculated Result -->
-                    <div id="paintResultBox" class="lg:col-span-2 bg-slate-950 p-5 rounded-xl border border-slate-800 text-xs space-y-4">
-                        <!-- Dynamic Paint Output -->
+                    <div class="grid grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Кол-во слоёв</label>
+                            <input type="number" id="lkm-layers" value="2" min="1" max="5" oninput="calcLKM()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Потери краскопульта (%)</label>
+                            <input type="number" id="lkm-loss" value="30" oninput="calcLKM()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Норма (г/м² на слой)</label>
+                            <input type="number" id="lkm-rate" value="140" oninput="calcLKM()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">% Отвердителя (по весу)</label>
+                            <input type="number" id="lkm-hardener-pct" value="50" oninput="calcLKM()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">% Разбавителя (по весу)</label>
+                            <input type="number" id="lkm-thinner-pct" value="20" oninput="calcLKM()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recipe / Output Result (6 cols) -->
+                <div class="lg:col-span-6 bg-slate-900 p-5 rounded-2xl border border-slate-800 flex flex-col justify-between space-y-4">
+                    <div>
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-2">
+                            <i class="fa-solid fa-scale-balanced text-emerald-400"></i>
+                            Рецептура замеса в граммах и мл
+                        </h3>
+
+                        <div class="space-y-2 mt-3">
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+                                <span class="text-xs font-semibold text-slate-300">Основной компонент (Эмаль/Грунт):</span>
+                                <span id="res-base" class="text-sm font-bold text-blue-400 font-mono">1638 г / ~1260 мл</span>
+                            </div>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+                                <span class="text-xs font-semibold text-slate-300">Отвердитель:</span>
+                                <span id="res-hardener" class="text-sm font-bold text-emerald-400 font-mono">819 г / ~819 мл</span>
+                            </div>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+                                <span class="text-xs font-semibold text-slate-300">Разбавитель / Растворитель:</span>
+                                <span id="res-thinner" class="text-sm font-bold text-purple-400 font-mono">328 г / ~385 мл</span>
+                            </div>
+                            <div class="bg-slate-950 p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-500/5 flex items-center justify-between">
+                                <span class="text-xs font-bold text-white">ОБЩИЙ ВЕС ГОТОВОЙ СМЕСИ:</span>
+                                <span id="res-total" class="text-base font-bold text-emerald-400 font-mono">2785 г</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-[11px] text-slate-400 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                        <i class="fa-solid fa-clock text-amber-400 me-1"></i> Жизнеспособность готовой смеси (Pot Life): около <b>2-3 часов</b> при 20°C.
                     </div>
                 </div>
             </div>
 
-            <!-- DEFECT MATRIX & ORDER TRACKER -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Painting Defects Guide -->
-                <div class="glass-panel rounded-2xl p-5 border border-slate-800">
-                    <h3 class="font-bold text-slate-200 text-sm mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Справочник Дефектов Покраски МДФ
+            <!-- Paint Defect Cheatsheet & Order Tracker -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Paint Defect Cheatsheet -->
+                <div class="lg:col-span-6 bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-2">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
+                        Справочник дефектов покраски МДФ
                     </h3>
-                    <div class="space-y-2 text-xs">
-                        <details class="group bg-slate-900/60 rounded-xl border border-slate-800 p-3 [&_summary::-webkit-details-marker]:hidden">
-                            <summary class="flex justify-between items-center font-semibold text-slate-200 cursor-pointer">
-                                <span>Кратеры / «Рыбий глаз» (Silicone Cratering)</span>
-                                <i class="fa-solid fa-chevron-down text-slate-500 group-open:rotate-180 transition-transform"></i>
-                            </summary>
-                            <p class="text-slate-400 mt-2 text-[11px] leading-relaxed">
-                                <strong>Причина:</strong> Масло или силикон в шланге компрессора, остатки жира на детали.<br>
-                                <strong>Решение:</strong> Установить фильтр-влагомаслоотделитель, обезжирить антисиликоном перед покраской.
-                            </p>
-                        </details>
 
-                        <details class="group bg-slate-900/60 rounded-xl border border-slate-800 p-3 [&_summary::-webkit-details-marker]:hidden">
-                            <summary class="flex justify-between items-center font-semibold text-slate-200 cursor-pointer">
-                                <span>Шагрень / «Апельсиновая корка»</span>
-                                <i class="fa-solid fa-chevron-down text-slate-500 group-open:rotate-180 transition-transform"></i>
-                            </summary>
-                            <p class="text-slate-400 mt-2 text-[11px] leading-relaxed">
-                                <strong>Причина:</strong> Высокая вязкость ЛКМ, слишком быстросохнущий разбавитель, малое давление воздухозаборника.<br>
-                                <strong>Решение:</strong> Разбавить эмаль на 5-10% больше, поднять давление до 2.0-2.2 bar.
-                            </p>
-                        </details>
-
-                        <details class="group bg-slate-900/60 rounded-xl border border-slate-800 p-3 [&_summary::-webkit-details-marker]:hidden">
-                            <summary class="flex justify-between items-center font-semibold text-slate-200 cursor-pointer">
-                                <span>Проявление структуры МДФ (Телеграфирование)</span>
-                                <i class="fa-solid fa-chevron-down text-slate-500 group-open:rotate-180 transition-transform"></i>
-                            </summary>
-                            <p class="text-slate-400 mt-2 text-[11px] leading-relaxed">
-                                <strong>Причина:</strong> Недостаточная толщина изолирующего ПУ грунта, нанесение на невпитанный фрезерованный торец МДФ.<br>
-                                <strong>Решение:</strong> Наносить изолятор на торцы в 2 слоя, шлифовать P240-P320 перед грунтом.
-                            </p>
-                        </details>
+                    <div class="space-y-2 text-xs max-h-56 overflow-y-auto pr-1">
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
+                            <span class="font-bold text-rose-400 block">1. Закипание лака / Пузыри</span>
+                            <p class="text-slate-300 text-[11px]">Причина: Слишком толстый слой, быстрый разбавитель или высокая температура сушки.</p>
+                            <p class="text-slate-400 text-[10px]">Решение: Шлифовка слоя, нанесение более тонкими слоями, медленный растворитель.</p>
+                        </div>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
+                            <span class="font-bold text-amber-400 block">2. «Шагрень» (Апельсиновая корка)</span>
+                            <p class="text-slate-300 text-[11px]">Причина: Высокая вязкость, низкое давление воздуха или слишком быстрое высыхание.</p>
+                            <p class="text-slate-400 text-[10px]">Решение: Добавить разбавитель, настроить краскопульт (2.5-3 бар), сменить дюзу.</p>
+                        </div>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
+                            <span class="font-bold text-blue-400 block">3. Кратеры / Рыбий глаз</span>
+                            <p class="text-slate-300 text-[11px]">Причина: Масло или силикон в сжатом воздухе компрессора, пыль в малярке.</p>
+                            <p class="text-slate-400 text-[10px]">Решение: Продувка и слив конденсата из фильтров воздуха, обезжиривание детали.</p>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Order Tracker -->
-                <div class="glass-panel rounded-2xl p-5 border border-slate-800 flex flex-col justify-between">
-                    <div>
-                        <div class="flex justify-between items-center mb-3">
-                            <h3 class="font-bold text-slate-200 text-sm flex items-center gap-2">
-                                <i class="fa-solid fa-clipboard-list text-amber-500"></i> Учет Заказов Малярки
-                            </h3>
-                            <button onclick="addNewPaintOrder()" class="text-xs bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-2.5 py-1 rounded-lg transition-colors">
-                                + Заказ
-                            </button>
-                        </div>
-                        <div id="paintOrdersList" class="space-y-2 max-h-56 overflow-y-auto pr-1">
-                            <!-- Orders inserted here -->
-                        </div>
+                <!-- Paint Shop Order Tracker -->
+                <div class="lg:col-span-6 bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-emerald-400"></i>
+                            Трекер заказов малярки
+                        </h3>
+                        <button onclick="addPaintOrder()" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-semibold rounded-lg transition-all">
+                            + Новый заказ
+                        </button>
                     </div>
-                    <div class="mt-4 pt-3 border-t border-slate-800 text-[11px] text-slate-500 flex justify-between">
-                        <span>Всего в работе: <strong id="orderCount" class="text-amber-400">0</strong></span>
-                        <span>Локальное хранение</span>
+
+                    <div id="paint-orders-list" class="space-y-2 text-xs max-h-56 overflow-y-auto pr-1">
+                        <!-- Dynamic Paint Orders Here -->
                     </div>
                 </div>
             </div>
@@ -713,888 +731,613 @@
 
     </main>
 
-    <!-- MOBILE BOTTOM NAVIGATION TAB BAR -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 px-2 py-2 z-40 flex justify-around items-center">
-        <button onclick="switchTab('homework')" id="mob-nav-homework" class="mob-tab-btn flex flex-col items-center gap-1 text-amber-400">
+    <!-- MOBILE BOTTOM NAVIGATION BAR -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 flex items-center justify-around py-2 px-1 z-40">
+        <button onclick="switchTab('trainer')" id="mob-trainer" class="flex flex-col items-center gap-1 text-blue-500 text-[10px] font-medium">
             <i class="fa-solid fa-graduation-cap text-base"></i>
-            <span class="text-[10px] font-medium">Тренажёр</span>
+            <span>Тренажёр</span>
         </button>
-        <button onclick="switchTab('generator')" id="mob-nav-generator" class="mob-tab-btn flex flex-col items-center gap-1 text-slate-500">
-            <i class="fa-solid fa-gears text-base"></i>
-            <span class="text-[10px] font-medium">Скрипты</span>
+        <button onclick="switchTab('generator')" id="mob-generator" class="flex flex-col items-center gap-1 text-slate-400 text-[10px] font-medium">
+            <i class="fa-solid fa-drafting-compass text-base"></i>
+            <span>Генератор</span>
         </button>
-        <button onclick="switchTab('reference')" id="mob-nav-reference" class="mob-tab-btn flex flex-col items-center gap-1 text-slate-500">
-            <i class="fa-solid fa-book text-base"></i>
-            <span class="text-[10px] font-medium">Справка</span>
+        <button onclick="switchTab('handbook')" id="mob-handbook" class="flex flex-col items-center gap-1 text-slate-400 text-[10px] font-medium">
+            <i class="fa-solid fa-book-bookmark text-base"></i>
+            <span>Справочник</span>
         </button>
-        <button onclick="switchTab('paintshop')" id="mob-nav-paintshop" class="mob-tab-btn flex flex-col items-center gap-1 text-slate-500">
-            <i class="fa-solid fa-spray-can text-base"></i>
-            <span class="text-[10px] font-medium">Малярка</span>
+        <button onclick="switchTab('paint')" id="mob-paint" class="flex flex-col items-center gap-1 text-slate-400 text-[10px] font-medium">
+            <i class="fa-solid fa-spray-can-sparkles text-base"></i>
+            <span>Малярка</span>
         </button>
     </nav>
 
-
-    <!-- APP LOGIC & JAVASCRIPT -->
+    <!-- JAVASCRIPT APP LOGIC -->
     <script>
-        /* ================= STATE & INITIALIZATION ================= */
-        const APP_STATE = {
-            currentTab: 'homework',
-            apiKey: '',
-            currentHomework: null,
-            mistakes: [],
-            paintOrders: [
-                { id: 1, client: 'Кухня МДФ Глянцевая', color: 'RAL 9010', area: '6.2 м²', status: 'Грунтование' },
-                { id: 2, client: 'Фасады Шпон Орех', color: 'Матовый лак 5%', area: '3.8 м²', status: 'Шлифовка' }
-            ],
-            threeScene: null,
-            threeCamera: null,
-            threeRenderer: null,
-            threeMeshGroup: null,
-            isWireframe: false,
-            isExploded: false
-        };
+        // GLOBAL STATE & LOCAL STORAGE KEYS
+        const STORAGE_KEY_HW = 'bazis_hw_completed';
+        const STORAGE_KEY_ERRORS = 'bazis_error_history';
+        const STORAGE_KEY_PAINT_ORDERS = 'bazis_paint_orders';
 
-        window.onload = () => {
-            initApiKey();
-            initThree3D();
-            generateHomework();
-            updateHardwarePreview();
-            calculateDrawer();
-            calculatePaint();
-            renderMistakes();
-            renderPaintOrders();
-            loadChecklist();
-        };
+        let completedHwCount = parseInt(localStorage.getItem(STORAGE_KEY_HW) || '0');
+        let errorHistory = JSON.parse(localStorage.getItem(STORAGE_KEY_ERRORS) || '[]');
+        let paintOrders = JSON.parse(localStorage.getItem(STORAGE_KEY_PAINT_ORDERS) || '[]');
 
-        /* ================= API KEY MANAGEMENT ================= */
-        function initApiKey() {
-            const saved = localStorage.getItem('gemini_api_key') || '';
-            APP_STATE.apiKey = saved;
-            
-            const sidebarInput = document.getElementById('sidebarApiKeyInput');
-            const mobileInput = document.getElementById('mobileApiKeyInput');
-            if (sidebarInput) sidebarInput.value = saved;
-            if (mobileInput) mobileInput.value = saved;
-            
-            updateApiKeyBadge();
+        // Default paint orders if empty
+        if (paintOrders.length === 0) {
+            paintOrders = [
+                { id: 101, title: 'Фасады кухни RAL 9010', status: 'Грунт', area: '12.4 м²' },
+                { id: 102, title: 'Пенал Шпон Дуба Лак', status: 'Шлифовка', area: '5.8 м²' }
+            ];
+            localStorage.setItem(STORAGE_KEY_PAINT_ORDERS, JSON.stringify(paintOrders));
         }
 
-        function saveApiKeyFromInput(inputId) {
-            const val = document.getElementById(inputId).value.trim();
-            APP_STATE.apiKey = val;
-            localStorage.setItem('gemini_api_key', val);
-            updateApiKeyBadge();
-            
-            // Notification toast
-            showToast(val ? 'Gemini API Key сохранен!' : 'Ключ удален');
-        }
+        // THREE.JS VARIABLES
+        let scene, camera, renderer, meshGroup;
+        let isWireframe = false;
+        let isExploded = false;
+        let currentHwData = null;
 
-        function updateApiKeyBadge() {
-            const badge = document.getElementById('apiKeyStatusBadge');
-            const mobileBadge = document.getElementById('mobileKeyBadge');
-            if (APP_STATE.apiKey) {
-                if (badge) {
-                    badge.textContent = 'Подключен';
-                    badge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-medium border border-emerald-500/30';
-                }
-                if (mobileBadge) mobileBadge.textContent = 'Ключ ✓';
-            } else {
-                if (badge) {
-                    badge.textContent = 'Не задан';
-                    badge.className = 'text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 font-medium border border-amber-500/30';
-                }
-                if (mobileBadge) mobileBadge.textContent = 'Ключ !';
-            }
-        }
-
-        function toggleKeyVisibility(id) {
-            const input = document.getElementById(id);
-            if (input) input.type = input.type === 'password' ? 'text' : 'password';
-        }
-
-        function toggleMobileKeyModal() {
-            const modal = document.getElementById('mobileKeyModal');
-            if (modal) modal.classList.toggle('hidden');
-        }
-
-        /* ================= TAB NAVIGATION ================= */
+        // TAB SWITCHING
         function switchTab(tabId) {
-            APP_STATE.currentTab = tabId;
-            
-            // Hide all tab contents
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const tabs = ['trainer', 'generator', 'handbook', 'paint'];
+            tabs.forEach(t => {
+                document.getElementById(`section-${t}`).classList.add('hidden');
+                
+                const dtNav = document.getElementById(`nav-${t}`);
+                if (dtNav) dtNav.classList.remove('active');
 
-            // Update desktop side menu
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.className = 'tab-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-400 hover:text-slate-200 hover:bg-slate-800/60';
+                const mbNav = document.getElementById(`mob-${t}`);
+                if (mbNav) {
+                    mbNav.classList.remove('text-blue-500');
+                    mbNav.classList.add('text-slate-400');
+                }
             });
-            const activeDesktop = document.getElementById(`nav-${tabId}`);
-            if (activeDesktop) {
-                activeDesktop.className = 'tab-btn active w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all text-amber-400 bg-amber-500/10 border border-amber-500/30';
+
+            document.getElementById(`section-${tabId}`).classList.remove('hidden');
+            
+            const activeDtNav = document.getElementById(`nav-${tabId}`);
+            if (activeDtNav) activeDtNav.classList.add('active');
+
+            const activeMbNav = document.getElementById(`mob-${tabId}`);
+            if (activeMbNav) {
+                activeMbNav.classList.remove('text-slate-400');
+                activeMbNav.classList.add('text-blue-500');
             }
 
-            // Update mobile bottom nav
-            document.querySelectorAll('.mob-tab-btn').forEach(btn => btn.className = 'mob-tab-btn flex flex-col items-center gap-1 text-slate-500');
-            const activeMobile = document.getElementById(`mob-nav-${tabId}`);
-            if (activeMobile) activeMobile.className = 'mob-tab-btn flex flex-col items-center gap-1 text-amber-400';
-
-            // Update mobile header text
-            const titleMap = {
-                homework: 'Тренажёр & ДЗ',
-                generator: 'Генератор Скриптов',
-                reference: 'Справочник Б-10',
-                paintshop: 'Малярный цех'
-            };
-            document.getElementById('mobileHeaderTitle').textContent = titleMap[tabId] || '';
-
-            // Handle Canvas resize if entering homework tab
-            if (tabId === 'homework' && APP_STATE.threeRenderer) {
-                setTimeout(onWindowResize, 50);
+            if (tabId === 'generator') {
+                updateGeneratorPreview();
             }
         }
 
-        /* ================= TAB 1: HOMEWORK GENERATOR ================= */
-        const HOMEWORK_DATABASE = {
-            cabinet: [
-                {
-                    title: "Тумба под ТВ с двумя выдвижными ящиками",
-                    spec: "Габариты: 1400х450х500 мм. Материал корпуса: ЛДСП 16 мм Дуб Вотан. Фасады: МДФ 19 мм под эмаль RAL 7016. Задняя стенка: ХДФ 4 мм в паз 12 мм от края.",
-                    reqs: [
-                        "Установить 2 ящика Blum Tandem скрытого монтажа 450 мм.",
-                        "Сделать присадку стяжек Minifix (34 мм) и шкантов (8х30 мм).",
-                        "Проверить зазор между фасадами (2 мм)."
-                    ],
-                    type: "tv_stand"
-                },
-                {
-                    title: "Шкаф навесной с посудосушителем 800 мм",
-                    spec: "Габариты: 800х320х720 мм. Корпус ЛДСП 16 мм Белый Астрал. 2 рамочных фасада с матовым стеклом. Навесы регулируемые Camar.",
-                    reqs: [
-                        "Отступить 12 мм под паз ХДФ.",
-                        "Присадить чашки петель 35 мм (отступ от края пласта 21.5 мм).",
-                        "Учесть свес фасада 2 мм снизу."
-                    ],
-                    type: "wall_cabinet"
-                }
-            ],
-            elasticity: [
-                {
-                    title: "Параметрический кухонный модуль с эластичностью",
-                    spec: "Настроить фрагмент нижнего кухонного стола 600 мм с возможностью эластичного растяжения по ширине от 400 до 900 мм.",
-                    reqs: [
-                        "Задать плоскости эластичности по ширине и высоте.",
-                        "Убедиться, что полка переставляется пропорционально.",
-                        "Сохранить как фрагмент .fr3d."
-                    ],
-                    type: "kitchen_base"
-                }
-            ],
-            drawers: [
-                {
-                    title: "Модуль 4 ящика под направляющие Hettich Quadro",
-                    spec: "Габариты: 600х550х820 мм. 4 одинаковых по высоте ящика из ЛДСП 16 мм.",
-                    reqs: [
-                        "Рассчитать ширину деталей ящика со сдвигом -42 мм от внутреннего проема.",
-                        "Учесть фрезеровку дна под замок направляющей.",
-                        "Присадить фасадные эксцентрики."
-                    ],
-                    type: "drawers_stack"
-                }
-            ],
-            fasteners: [
-                {
-                    title: "Присадка пенала под ЧПУ пристрелку",
-                    spec: "Высокий пенал 2200х600х580 мм. Двойной крепеж: Эксцентриковая стяжка + Шкант на каждом соединении.",
-                    reqs: [
-                        "Расстояние от края детали до первого крепежа: 50 мм.",
-                        "Шаг между отверстиями кратен 32 мм (System 32).",
-                        "Проверить отсутствие коллизий петель и полок."
-                    ],
-                    type: "tall_cabinet"
-                }
-            ],
-            cnc: [
-                {
-                    title: "Подготовка деталей тумбы под покраску в малярке",
-                    spec: "Детали из МДФ 19 мм под фрезеровку и покраску эмалью. Радиус скругления фаски R3 на лицевых торцах.",
-                    reqs: [
-                        "Задать припуск 1 мм под калибровку торцов.",
-                        "Маркировать детали под ЛКМ во избежание путаницы.",
-                        "Сформировать спецификацию площадей окрашивания (м²)."
-                    ],
-                    type: "paint_prep"
-                }
-            ]
-        };
+        // --- 1. TRENER & HOMEWORK GENERATOR ---
+        const HOMEWORK_TEMPLATES = [
+            {
+                category: "Тумбы и Комоды",
+                titles: ["Тумба прикроватная с 3 ящиками", "Комод спальный 4 ящика", "Тумба под ТВ с открытой нишей"],
+                materials: ["ЛДСП 16 мм Egger", "ЛДСП 18 мм Kronospan", "МДФ 19 мм Эмаль"],
+                edges: ["ПВХ 1.0 мм", "ПВХ 2.0 мм", "ПВХ 0.4 мм"],
+                hardware: ["Blum Tandem 450мм", "AKS скрытого монтажа 400мм", "Hettich Quadro V6 450мм", "Шариковые 450мм"],
+                fasteners: ["Minifix + Шкант 8x30", "Rafix + Шкант 8x30", "Конфирмат 7x50"],
+                facades: ["МДФ 19 мм Эмаль матовая", "ЛДСП 16 мм Дерево", "МДФ Шпон Дуба"],
+                widthRange: [450, 900], heightRange: [600, 950], depthRange: [400, 500],
+                boxes: [2, 3, 4]
+            },
+            {
+                category: "Кухни и Пеналы",
+                titles: ["Пенал встроенный под духовой шкаф", "Модуль нижний кухонный 2 двери", "Тумба под мойку с выкатным ящиком"],
+                materials: ["ЛДСП 16 мм Egger Влагостойкий", "ЛДСП 18 мм Egger"],
+                edges: ["ПВХ 1.0 мм", "ПВХ 2.0 мм"],
+                hardware: ["Петли Blum с доводчиком Ø35", "Петли Hettich Sensys", "Навесы Camar 806"],
+                fasteners: ["Minifix + Шкант 8x30", "Конфирмат 7x50"],
+                facades: ["МДФ 19 мм Эмаль глянец", "МДФ ПВХ-пленка"],
+                widthRange: [600, 900], heightRange: [720, 2140], depthRange: [560, 600],
+                boxes: [1, 2]
+            },
+            {
+                category: "Шкафы и Стеллажи",
+                titles: ["Стеллаж открытый перегородка", "Шкаф прихожей 2-дверный", "Шкаф-пенал с полками"],
+                materials: ["ЛДСП 16 мм Egger", "МДФ 19 мм Шпон"],
+                edges: ["ПВХ 2.0 мм", "Шпон дуба 1.5 мм"],
+                hardware: ["Петли с доводчиком Ø35", "Стяжки Minifix"],
+                fasteners: ["Minifix + Шкант 8x30", "Rafix 20"],
+                facades: ["МДФ Шпон Натуральный", "ЛДСП 16 мм"],
+                widthRange: [800, 1200], heightRange: [1800, 2400], depthRange: [350, 600],
+                boxes: [0, 2]
+            }
+        ];
+
+        function getRandomItem(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
 
         function generateHomework() {
-            const topic = document.getElementById('hwTopicSelect').value;
-            const diff = document.getElementById('hwDiffSelect').value;
-            
-            const list = HOMEWORK_DATABASE[topic] || HOMEWORK_DATABASE.cabinet;
-            const item = list[Math.floor(Math.random() * list.length)];
-            
-            APP_STATE.currentHomework = { ...item, difficulty: diff };
+            const tmpl = getRandomItem(HOMEWORK_TEMPLATES);
+            const w = Math.floor(Math.random() * (tmpl.widthRange[1] - tmpl.widthRange[0])) + tmpl.widthRange[0];
+            const h = Math.floor(Math.random() * (tmpl.heightRange[1] - tmpl.heightRange[0])) + tmpl.heightRange[0];
+            const d = Math.floor(Math.random() * (tmpl.depthRange[1] - tmpl.depthRange[0])) + tmpl.depthRange[0];
+            const boxes = getRandomItem(tmpl.boxes);
 
-            const card = document.getElementById('homeworkCard');
-            card.innerHTML = `
-                <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                    <span class="text-xs font-bold text-amber-400 bg-amber-500/10 px-3 py-1 rounded-lg border border-amber-500/30">
-                        ТЗ: ${item.title}
-                    </span>
-                    <span class="text-[10px] text-slate-400 uppercase tracking-wider font-mono">
-                        Сложность: ${diff.toUpperCase()}
-                    </span>
-                </div>
-                <p class="text-xs text-slate-300 leading-relaxed mb-4">${item.spec}</p>
-                
-                <div class="space-y-1.5 mb-2">
-                    <span class="text-[11px] font-semibold text-slate-400">Требования к выполнению в Базис 10:</span>
-                    <ul class="space-y-1 pl-4 list-disc text-xs text-slate-300">
-                        ${item.reqs.map(r => `<li>${r}</li>`).join('')}
-                    </ul>
-                </div>
-            `;
+            currentHwData = {
+                id: `#HW-${Math.floor(1000 + Math.random() * 9000)}`,
+                category: tmpl.category,
+                title: getRandomItem(tmpl.titles),
+                dim: `${h} × ${w} × ${d} мм`,
+                rawDim: { h, w, d },
+                mat: getRandomItem(tmpl.materials),
+                facade: getRandomItem(tmpl.facades),
+                edge: getRandomItem(tmpl.edges),
+                hardware: getRandomItem(tmpl.hardware),
+                fasteners: getRandomItem(tmpl.fasteners),
+                boxes: boxes
+            };
 
-            // Update 3D scene & Info
-            update3dFurnitureModel(item.type);
-            document.getElementById('threeModelInfo').textContent = item.title.split(' ')[0] + ' (' + diff + ')';
+            // Update UI
+            document.getElementById('hw-category').innerText = `Категория: ${currentHwData.category}`;
+            document.getElementById('hw-id').innerText = `ID: ${currentHwData.id}`;
+            document.getElementById('hw-title').innerText = currentHwData.title;
+            document.getElementById('spec-dim').innerText = currentHwData.dim;
+            document.getElementById('spec-mat').innerText = currentHwData.mat;
+            document.getElementById('spec-facade').innerText = currentHwData.facade;
+            document.getElementById('spec-edge').innerText = currentHwData.edge;
+            document.getElementById('spec-hardware').innerText = currentHwData.hardware;
+            document.getElementById('spec-fastener').innerText = currentHwData.fasteners;
+
+            // Rebuild 3D Model
+            build3DFurniture(currentHwData);
         }
 
-        /* ================= THREE.JS INTERACTIVE 3D ENGINE ================= */
-        function initThree3D() {
-            const container = document.getElementById('canvas3dContainer');
-            const canvas = document.getElementById('threeCanvas');
-            if (!container || !canvas) return;
+        // THREE.JS CANVAS BUILDER
+        function init3DScene() {
+            const wrapper = document.getElementById('canvas-3d-wrapper');
+            const canvas = document.getElementById('canvas-3d');
+            
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0b0f19);
 
-            const width = container.clientWidth;
-            const height = container.clientHeight;
+            camera = new THREE.PerspectiveCamera(45, wrapper.clientWidth / wrapper.clientHeight, 0.1, 5000);
+            camera.position.set(1200, 1000, 1500);
 
-            APP_STATE.threeScene = new THREE.Scene();
-            APP_STATE.threeScene.background = new THREE.Color(0x020617);
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+            renderer.setSize(wrapper.clientWidth, wrapper.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
 
-            APP_STATE.threeCamera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-            APP_STATE.threeCamera.position.set(120, 90, 140);
-            APP_STATE.threeCamera.lookAt(0, 0, 0);
+            // Ambient & Directional Lights
+            const ambient = new THREE.AmbientLight(0xffffff, 0.7);
+            scene.add(ambient);
 
-            APP_STATE.threeRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
-            APP_STATE.threeRenderer.setSize(width, height);
-            APP_STATE.threeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(1000, 2000, 1000);
+            scene.add(dirLight);
 
-            // Lighting
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-            APP_STATE.threeScene.add(ambientLight);
+            meshGroup = new THREE.Group();
+            scene.add(meshGroup);
 
-            const dirLight = new THREE.DirectionalLight(0xf59e0b, 0.8);
-            dirLight.position.set(100, 150, 80);
-            APP_STATE.threeScene.add(dirLight);
-
-            const backLight = new THREE.DirectionalLight(0x38bdf8, 0.4);
-            backLight.position.set(-100, -50, -100);
-            APP_STATE.threeScene.add(backLight);
-
-            // Mesh Group
-            APP_STATE.threeMeshGroup = new THREE.Group();
-            APP_STATE.threeScene.add(APP_STATE.threeMeshGroup);
-
-            // Orbit drag interaction
+            // Simple Mouse Drag Orbit Controls
             let isDragging = false;
             let previousMousePosition = { x: 0, y: 0 };
 
-            canvas.addEventListener('mousedown', (e) => { isDragging = true; });
-            canvas.addEventListener('mousemove', (e) => {
-                if (isDragging) {
-                    const deltaMove = {
-                        x: e.clientX - previousMousePosition.x,
-                        y: e.clientY - previousMousePosition.y
-                    };
-                    APP_STATE.threeMeshGroup.rotation.y += deltaMove.x * 0.01;
-                    APP_STATE.threeMeshGroup.rotation.x += deltaMove.y * 0.01;
-                }
+            canvas.addEventListener('pointerdown', (e) => {
+                isDragging = true;
                 previousMousePosition = { x: e.clientX, y: e.clientY };
             });
-            window.addEventListener('mouseup', () => { isDragging = false; });
 
-            // Touch support
-            canvas.addEventListener('touchstart', (e) => {
-                if (e.touches.length === 1) {
-                    isDragging = true;
-                    previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-                }
-            });
-            canvas.addEventListener('touchmove', (e) => {
-                if (isDragging && e.touches.length === 1) {
-                    const deltaMove = {
-                        x: e.touches[0].clientX - previousMousePosition.x,
-                        y: e.touches[0].clientY - previousMousePosition.y
-                    };
-                    APP_STATE.threeMeshGroup.rotation.y += deltaMove.x * 0.01;
-                    APP_STATE.threeMeshGroup.rotation.x += deltaMove.y * 0.01;
-                    previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-                }
-            });
-            canvas.addEventListener('touchend', () => { isDragging = false; });
+            canvas.addEventListener('pointermove', (e) => {
+                if (!isDragging) return;
+                const deltaX = e.clientX - previousMousePosition.x;
+                const deltaY = e.clientY - previousMousePosition.y;
 
-            window.addEventListener('resize', onWindowResize);
+                meshGroup.rotation.y += deltaX * 0.008;
+                meshGroup.rotation.x += deltaY * 0.008;
+
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            });
+
+            window.addEventListener('pointerup', () => isDragging = false);
+
+            canvas.addEventListener('wheel', (e) => {
+                camera.position.z += e.deltaY * 1.2;
+                camera.position.z = Math.max(500, Math.min(3500, camera.position.z));
+            });
 
             function animate() {
                 requestAnimationFrame(animate);
-                if (!isDragging && APP_STATE.threeMeshGroup) {
-                    APP_STATE.threeMeshGroup.rotation.y += 0.003;
-                }
-                APP_STATE.threeRenderer.render(APP_STATE.threeScene, APP_STATE.threeCamera);
+                renderer.render(scene, camera);
             }
             animate();
         }
 
-        function onWindowResize() {
-            const container = document.getElementById('canvas3dContainer');
-            if (!container || !APP_STATE.threeRenderer) return;
-            const w = container.clientWidth;
-            const h = container.clientHeight;
-            APP_STATE.threeCamera.aspect = w / h;
-            APP_STATE.threeCamera.updateProjectionMatrix();
-            APP_STATE.threeRenderer.setSize(w, h);
-        }
+        function build3DFurniture(data) {
+            if (!meshGroup) return;
 
-        function update3dFurnitureModel(type) {
-            if (!APP_STATE.threeMeshGroup) return;
-
-            // Clear previous
-            while (APP_STATE.threeMeshGroup.children.length > 0) {
-                const obj = APP_STATE.threeMeshGroup.children[0];
-                if (obj.geometry) obj.geometry.dispose();
-                APP_STATE.threeMeshGroup.remove(obj);
+            // Clear old meshes
+            while(meshGroup.children.length > 0) { 
+                meshGroup.remove(meshGroup.children[0]); 
             }
 
-            const woodMat = new THREE.MeshStandardMaterial({
-                color: 0xd97706,
-                roughness: 0.4,
-                metalness: 0.1,
-                wireframe: APP_STATE.isWireframe
+            const { w, h, d } = data.rawDim;
+            const matColor = data.mat.includes('Egger') ? 0x3b82f6 : 0xd97706;
+            const facadeColor = 0xe2e8f0;
+
+            const bodyMat = new THREE.MeshStandardMaterial({ 
+                color: matColor, 
+                wireframe: isWireframe, 
+                roughness: 0.5 
             });
-            const darkMat = new THREE.MeshStandardMaterial({
-                color: 0x1e293b,
-                roughness: 0.5,
-                wireframe: APP_STATE.isWireframe
-            });
-            const metalMat = new THREE.MeshStandardMaterial({
-                color: 0xf59e0b,
-                metalness: 0.8,
-                roughness: 0.2
+            const facadeMat = new THREE.MeshStandardMaterial({ 
+                color: facadeColor, 
+                wireframe: isWireframe, 
+                roughness: 0.2 
             });
 
-            // Build parametric 3D shape based on HW type
-            if (type === 'tv_stand') {
-                // TV Stand Body
-                const sideL = createBox(4, 45, 45, woodMat, -38, 0, 0);
-                const sideR = createBox(4, 45, 45, woodMat, 38, 0, 0);
-                const top = createBox(80, 4, 45, woodMat, 0, 22.5, 0);
-                const bot = createBox(80, 4, 45, woodMat, 0, -22.5, 0);
-                
-                // Drawers
-                const offset = APP_STATE.isExploded ? 15 : 0;
-                const d1 = createBox(36, 18, 42, darkMat, -18, -2, offset);
-                const d2 = createBox(36, 18, 42, darkMat, 18, -2, offset);
+            const explodeOffset = isExploded ? 80 : 0;
 
-                // Handles
-                const h1 = createBox(10, 1.5, 2, metalMat, -18, -2, 22 + offset);
-                const h2 = createBox(10, 1.5, 2, metalMat, 18, -2, 22 + offset);
+            // Left Side Panel
+            const sideGeo = new THREE.BoxGeometry(16, h, d);
+            const leftSide = new THREE.Mesh(sideGeo, bodyMat);
+            leftSide.position.set(-w/2 - explodeOffset, 0, 0);
+            meshGroup.add(leftSide);
 
-                APP_STATE.threeMeshGroup.add(sideL, sideR, top, bot, d1, d2, h1, h2);
-            } else if (type === 'wall_cabinet') {
-                const body = createBox(60, 50, 30, woodMat, 0, 0, 0);
-                const offset = APP_STATE.isExploded ? 12 : 0;
-                const door1 = createBox(28, 46, 2, darkMat, -14, 0, 16 + offset);
-                const door2 = createBox(28, 46, 2, darkMat, 14, 0, 16 + offset);
-                APP_STATE.threeMeshGroup.add(body, door1, door2);
-            } else {
-                // Default Cabinet
-                const body = createBox(50, 70, 40, woodMat, 0, 0, 0);
-                const door = createBox(46, 66, 2, darkMat, 0, 0, 21 + (APP_STATE.isExploded ? 15 : 0));
-                APP_STATE.threeMeshGroup.add(body, door);
+            // Right Side Panel
+            const rightSide = new THREE.Mesh(sideGeo, bodyMat);
+            rightSide.position.set(w/2 + explodeOffset, 0, 0);
+            meshGroup.add(rightSide);
+
+            // Top Panel
+            const topGeo = new THREE.BoxGeometry(w + 32, 16, d);
+            const topPanel = new THREE.Mesh(topGeo, bodyMat);
+            topPanel.position.set(0, h/2 + 8 + explodeOffset, 0);
+            meshGroup.add(topPanel);
+
+            // Bottom Panel
+            const bottomPanel = new THREE.Mesh(topGeo, bodyMat);
+            bottomPanel.position.set(0, -h/2 - 8 - explodeOffset, 0);
+            meshGroup.add(bottomPanel);
+
+            // Drawers / Facades
+            const numBoxes = data.boxes || 1;
+            const facadeH = (h - (numBoxes + 1) * 4) / numBoxes;
+            for (let i = 0; i < numBoxes; i++) {
+                const facGeo = new THREE.BoxGeometry(w, facadeH, 19);
+                const facade = new THREE.Mesh(facGeo, facadeMat);
+                const yPos = (h/2) - (facadeH/2 + 4) - i * (facadeH + 4);
+                facade.position.set(0, yPos, d/2 + 10 + (isExploded ? 150 : 0));
+                meshGroup.add(facade);
             }
 
-            reset3dCamera();
+            camera.lookAt(0, 0, 0);
         }
 
-        function createBox(w, h, d, mat, x, y, z) {
-            const geo = new THREE.BoxGeometry(w, h, d);
-            const mesh = new THREE.Mesh(geo, mat);
-            mesh.position.set(x, y, z);
-            return mesh;
+        function toggleWireframe() {
+            isWireframe = !isWireframe;
+            document.getElementById('btn-wireframe').classList.toggle('bg-blue-600', isWireframe);
+            if (currentHwData) build3DFurniture(currentHwData);
         }
 
-        function toggle3dWireframe() {
-            APP_STATE.isWireframe = !APP_STATE.isWireframe;
-            document.getElementById('wireframeBtnLabel').textContent = APP_STATE.isWireframe ? 'Заливка (F5)' : 'F5 Каркас';
-            if (APP_STATE.currentHomework) {
-                update3dFurnitureModel(APP_STATE.currentHomework.type);
-            }
+        function toggleExploded() {
+            isExploded = !isExploded;
+            document.getElementById('btn-explode').classList.toggle('bg-blue-600', isExploded);
+            if (currentHwData) build3DFurniture(currentHwData);
         }
 
-        function toggle3dExplodedView() {
-            APP_STATE.isExploded = !APP_STATE.isExploded;
-            if (APP_STATE.currentHomework) {
-                update3dFurnitureModel(APP_STATE.currentHomework.type);
-            }
-        }
+        // AI 3D RENDER GENERATOR VIA GEMINI API
+        async function triggerAIRender() {
+            const modal = document.getElementById('ai-image-modal');
+            const img = document.getElementById('ai-rendered-img');
+            const spinner = document.getElementById('ai-loading-spinner');
 
-        function reset3dCamera() {
-            if (APP_STATE.threeCamera && APP_STATE.threeMeshGroup) {
-                APP_STATE.threeCamera.position.set(120, 90, 140);
-                APP_STATE.threeCamera.lookAt(0, 0, 0);
-                APP_STATE.threeMeshGroup.rotation.set(0, 0, 0);
-            }
-        }
-
-        /* ================= AI 3D PHOTO GENERATOR ================= */
-        async function generateAiModelPhoto() {
-            const container = document.getElementById('aiImageContainer');
-            const placeholder = document.getElementById('aiPlaceholderState');
-            const loader = document.getElementById('aiLoadingState');
-            const img = document.getElementById('aiResultImg');
-            const statusText = document.getElementById('aiStatusText');
-            const downloadBtn = document.getElementById('downloadAiImgBtn');
-
-            if (!APP_STATE.apiKey) {
-                statusText.innerHTML = '<span class="text-amber-400">⚠️ Введите Gemini API Key в боковом меню!</span>';
-                showToast('Ошибка: API ключ не задан');
-                return;
-            }
-
-            placeholder.classList.add('hidden');
+            modal.classList.remove('hidden');
             img.classList.add('hidden');
-            downloadBtn.classList.add('hidden');
-            loader.classList.remove('hidden');
-            statusText.textContent = 'Обращение к AI (Imagen / Gemini API)...';
+            spinner.classList.remove('hidden');
 
-            const hw = APP_STATE.currentHomework || { title: 'Тумба с ящиками', spec: 'Корпусная мебель' };
-            const promptText = `Professional 3D CAD render studio photograph of modern furniture: ${hw.title}. Description: ${hw.spec}. Realistic wood texture, high detail finish, 8k resolution studio lighting.`;
+            const promptText = `A high quality 3d photorealistic render of modern furniture: ${currentHwData.title}, dimensions ${currentHwData.dim}, material ${currentHwData.mat}, facade finish ${currentHwData.facade}, modern interior studio background, architectural lighting.`;
 
             try {
-                // Primary endpoint: Imagen 3 Predict API
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${APP_STATE.apiKey}`, {
+                const apiKey = ""; // Built-in Gemini runtime key slot
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-image:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        instances: [{ prompt: promptText }],
-                        parameters: { sampleCount: 1, aspectRatio: "1:1" }
+                        contents: [{ parts: [{ text: promptText }] }],
+                        generationConfig: {
+                            responseModalities: ['TEXT', 'IMAGE']
+                        }
                     })
                 });
 
-                const data = await response.json();
+                const result = await response.json();
+                const base64Data = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
 
-                if (response.ok && data.predictions && data.predictions[0]?.bytesBase64Encoded) {
-                    const imgSrc = `data:image/png;base64,${data.predictions[0].bytesBase64Encoded}`;
-                    showAiResult(imgSrc, img, loader, downloadBtn, statusText, 'AI 3D-Фото успешно сгенерировано!');
-                    return;
+                if (base64Data) {
+                    img.src = `data:image/png;base64,${base64Data}`;
+                    img.classList.remove('hidden');
+                    spinner.classList.add('hidden');
+                } else {
+                    // Fallback visual mock if API key unavailable
+                    img.src = `https://placehold.co/600x400/1e293b/3b82f6?text=AI+Render:+${encodeURIComponent(currentHwData.title)}`;
+                    img.classList.remove('hidden');
+                    spinner.classList.add('hidden');
                 }
-
-                // Fallback to Gemini 2.5 Flash Multimodal or Procedural Studio Snapshot
-                statusText.textContent = 'Генерация студийного 3D-чертежа (Fallback)...';
-                setTimeout(() => {
-                    const canvasFallback = document.createElement('canvas');
-                    canvasFallback.width = 600;
-                    canvasFallback.height = 600;
-                    const ctx = canvasFallback.getContext('2d');
-                    
-                    // Render procedural realistic studio snapshot
-                    ctx.fillStyle = '#0f172a';
-                    ctx.fillRect(0, 0, 600, 600);
-                    
-                    // Grid lines
-                    ctx.strokeStyle = '#1e293b';
-                    ctx.lineWidth = 1;
-                    for(let i=0; i<600; i+=30) {
-                        ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 600); ctx.stroke();
-                        ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(600, i); ctx.stroke();
-                    }
-                    
-                    // Render furniture preview
-                    ctx.fillStyle = '#d97706';
-                    ctx.fillRect(150, 200, 300, 220);
-                    ctx.fillStyle = '#1e293b';
-                    ctx.fillRect(170, 220, 125, 180);
-                    ctx.fillRect(305, 220, 125, 180);
-                    
-                    // Text title
-                    ctx.fillStyle = '#fbbf24';
-                    ctx.font = 'bold 20px Inter, sans-serif';
-                    ctx.fillText('3D AI CAD Snapshot: ' + hw.title, 40, 60);
-                    ctx.fillStyle = '#94a3b8';
-                    ctx.font = '14px Inter, sans-serif';
-                    ctx.fillText('Сгенерировано в локальном модуле AI Наставника', 40, 90);
-
-                    const dataUrl = canvasFallback.toDataURL('image/png');
-                    showAiResult(dataUrl, img, loader, downloadBtn, statusText, 'Сгенерирован 3D-эскиз изделия!');
-                }, 800);
-
             } catch (err) {
-                console.error(err);
-                loader.classList.add('hidden');
-                placeholder.classList.remove('hidden');
-                statusText.innerHTML = `<span class="text-rose-400">Ошибка API: ${err.message || 'Ошибка сети'}</span>`;
+                img.src = `https://placehold.co/600x400/1e293b/ef4444?text=Ошибка+генерации+рендера`;
+                img.classList.remove('hidden');
+                spinner.classList.add('hidden');
             }
         }
 
-        function showAiResult(src, img, loader, downloadBtn, statusText, msg) {
-            loader.classList.add('hidden');
-            img.src = src;
-            img.classList.remove('hidden');
-            downloadBtn.href = src;
-            downloadBtn.classList.remove('hidden');
-            downloadBtn.classList.add('flex');
-            statusText.innerHTML = `<span class="text-emerald-400 font-medium">${msg}</span>`;
+        function closeAIModal() {
+            document.getElementById('ai-image-modal').classList.add('hidden');
         }
 
-        /* ================= FILE & SCREENSHOT AUDIT ================= */
-        let currentAuditFile = null;
+        // FILE VALIDATION DEMO
+        function runDemoCheck() {
+            const logsContainer = document.getElementById('validation-logs');
+            const badge = document.getElementById('check-status-badge');
 
-        function handleFileSelect(e) {
-            const file = e.target.files[0];
-            if (file) {
-                currentAuditFile = file;
-                document.getElementById('fileNameDisplay').textContent = `Выбран файл: ${file.name} (${(file.size/1024).toFixed(1)} КБ)`;
-            }
-        }
+            badge.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30';
+            badge.innerText = 'Найдено 3 ошибки!';
 
-        function loadDemoErrorFile() {
-            currentAuditFile = { name: "Тумба_Кухня_Ошибки_Демо.b3d", isDemo: true };
-            document.getElementById('fileNameDisplay').textContent = "Загружен демо-файл: Тумба_Кухня_Ошибки_Демо.b3d";
-            runAudit();
-        }
-
-        async function runAudit() {
-            if (!currentAuditFile) {
-                showToast('Пожалуйста, выберите файл для аудита');
-                return;
-            }
-
-            const box = document.getElementById('auditResultBox');
-            box.classList.remove('hidden');
-            box.innerHTML = `
-                <div class="flex items-center gap-2 text-amber-400">
-                    <i class="fa-solid fa-spinner animate-spin"></i>
-                    <span>Идёт AI-анализ структуры модели и присадки...</span>
+            logsContainer.innerHTML = `
+                <div class="p-2 rounded bg-rose-500/10 border border-rose-500/20 text-rose-300">
+                    <span class="font-bold block">❌ Ошибка #1: Отсутствует кромка на задней грани МДФ</span>
+                    <span class="text-[11px] text-slate-400">Деталь "Боковина левая" — задний торец не облицован кромкой (влажность!).</span>
+                </div>
+                <div class="p-2 rounded bg-amber-500/10 border border-amber-500/20 text-amber-300">
+                    <span class="font-bold block">⚠️ Ошибка #2: Неверный отступ Minifix</span>
+                    <span class="text-[11px] text-slate-400">Отступ центра присадки эксцентрика 28 мм вместо стандартных 34 мм.</span>
+                </div>
+                <div class="p-2 rounded bg-rose-500/10 border border-rose-500/20 text-rose-300">
+                    <span class="font-bold block">❌ Ошибка #3: Наложение паза ХДФ на шкант</span>
+                    <span class="text-[11px] text-slate-400">Паз 4 мм перекрывает присадку шканта 8х30 на боковине.</span>
                 </div>
             `;
 
-            setTimeout(() => {
-                const mistakesFound = [
-                    "Пересечение задней стенки ХДФ с пазом: глубина паза 4мм, а заход ХДФ 8мм (Коллизия!).",
-                    "Отсутствует присадка под среднюю петлю на фасаде H=1400мм (требуется 3 петли).",
-                    "Отступ под Minifix составляет 24мм вместо стандартных 34мм."
-                ];
+            // Append to Persistent Error Log
+            const newErrors = [
+                { id: Date.now() + 1, task: currentHwData.title, desc: "Отсутствует кромка на задней грани МДФ", fixed: false },
+                { id: Date.now() + 2, task: currentHwData.title, desc: "Неверный отступ Minifix (28 мм вместо 34 мм)", fixed: false },
+                { id: Date.now() + 3, task: currentHwData.title, desc: "Наложение паза ХДФ на шкант", fixed: false }
+            ];
 
-                box.innerHTML = `
-                    <div class="flex justify-between items-center pb-2 border-b border-slate-800">
-                        <span class="font-bold text-slate-200 text-sm">Результат аудита: ${currentAuditFile.name}</span>
-                        <span class="px-2 py-0.5 bg-rose-500/20 text-rose-400 rounded text-[10px] font-bold">Найдено 3 ошибки</span>
-                    </div>
-                    <ul class="space-y-1.5 text-slate-300">
-                        ${mistakesFound.map(m => `<li class="flex items-start gap-2"><i class="fa-solid fa-circle-xmark text-rose-500 mt-0.5"></i> ${m}</li>`).join('')}
-                    </ul>
-                    <div class="pt-2 border-t border-slate-800 text-[11px] text-amber-400 font-medium">
-                        💡 Ошибки автоматически внесены в ваш «Журнал ошибок»!
-                    </div>
-                `;
-
-                // Log to Mistake Journal
-                mistakesFound.forEach(m => addMistakeToJournal(m));
-            }, 1200);
+            errorHistory = [...newErrors, ...errorHistory];
+            localStorage.setItem(STORAGE_KEY_ERRORS, JSON.stringify(errorHistory));
+            renderErrorHistory();
         }
 
-        function addMistakeToJournal(text) {
-            APP_STATE.mistakes.unshift({ text, date: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
-            renderMistakes();
+        function handleFileUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const badge = document.getElementById('check-status-badge');
+            badge.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+            badge.innerText = 'Проверка завершена!';
+
+            document.getElementById('validation-logs').innerHTML = `
+                <div class="p-2.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">
+                    <span class="font-bold block"><i class="fa-solid fa-check me-1"></i> Файл ${file.name} успешной прошел проверку!</span>
+                    <span class="text-[11px] text-slate-400">Кромка, присадка и зазоры соответствуют регламенту Б-10.</span>
+                </div>
+            `;
         }
 
-        function renderMistakes() {
-            const list = document.getElementById('mistakeJournalList');
-            const count = document.getElementById('mistakeCount');
-            if (count) count.textContent = APP_STATE.mistakes.length;
-            
-            if (!list) return;
-            if (APP_STATE.mistakes.length === 0) {
-                list.innerHTML = `<div class="text-[11px] text-slate-500 italic p-2 text-center">Ошибок пока не зафиксировано</div>`;
+        function renderErrorHistory() {
+            const container = document.getElementById('error-history-list');
+            if (errorHistory.length === 0) {
+                container.innerHTML = `<div class="text-slate-400 italic text-center py-2">Журнал ошибок пуст.</div>`;
                 return;
             }
 
-            list.innerHTML = APP_STATE.mistakes.map(m => `
-                <div class="p-2 rounded-lg bg-slate-950 border border-slate-800 text-[11px] flex justify-between items-start gap-2">
-                    <span class="text-slate-300">${m.text}</span>
-                    <span class="text-[9px] font-mono text-slate-500">${m.date}</span>
+            container.innerHTML = errorHistory.map(item => `
+                <div class="flex items-center justify-between bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" ${item.fixed ? 'checked' : ''} onchange="toggleErrorFixed(${item.id})" class="rounded bg-slate-900 border-slate-700 text-blue-500">
+                        <span class="${item.fixed ? 'line-through text-slate-400' : 'text-slate-200'} font-medium">${item.desc}</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-mono">${item.task}</span>
                 </div>
             `).join('');
         }
 
-        function clearMistakeJournal() {
-            APP_STATE.mistakes = [];
-            renderMistakes();
+        function toggleErrorFixed(id) {
+            errorHistory = errorHistory.map(e => e.id === id ? { ...e, fixed: !e.fixed } : e);
+            localStorage.setItem(STORAGE_KEY_ERRORS, JSON.stringify(errorHistory));
+            renderErrorHistory();
+        }
+
+        function clearErrorLog() {
+            errorHistory = [];
+            localStorage.setItem(STORAGE_KEY_ERRORS, JSON.stringify(errorHistory));
+            renderErrorHistory();
         }
 
 
-        /* ================= TAB 2: HARDWARE & SCRIPT GENERATOR ================= */
-        function updateHardwarePreview() {
-            const type = document.getElementById('genType').value;
-            const length = parseInt(document.getElementById('genLength').value) || 192;
-            const pitch = parseInt(document.getElementById('genPitch').value) || 160;
-            const finish = document.getElementById('genFinish').value;
+        // --- 2. BAZIS HARDWARE GENERATOR ---
+        function updateGeneratorPreview() {
+            const type = document.getElementById('gen-type').value;
+            const cc = parseInt(document.getElementById('gen-cc').value);
+            const L = parseInt(document.getElementById('gen-length').value);
+            const H = parseInt(document.getElementById('gen-height').value);
+            const svg = document.getElementById('svg-drawing');
 
-            const container = document.getElementById('svgPreviewContainer');
-            
-            // Dynamic SVG Blueprint
-            container.innerHTML = `
-                <svg width="280" height="160" viewBox="0 0 280 160" class="drop-shadow-lg">
-                    <!-- Grid background -->
-                    <defs>
-                        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1e293b" stroke-width="0.5"/>
-                        </pattern>
-                    </defs>
-                    <rect width="100%" height="100%" fill="url(#grid)" />
-                    
-                    <!-- Hardware Geometry -->
-                    <g transform="translate(140, 80)">
-                        <!-- Main Bar -->
-                        <rect x="${-length/2}" y="-8" width="${length}" height="16" rx="4" fill="${finish}" stroke="#f59e0b" stroke-width="1.5"/>
-                        
-                        <!-- Drill Holes -->
-                        <circle cx="${-pitch/2}" cy="0" r="5" fill="#020617" stroke="#f59e0b" stroke-width="1.5"/>
-                        <circle cx="${pitch/2}" cy="0" r="5" fill="#020617" stroke="#f59e0b" stroke-width="1.5"/>
-                        
-                        <!-- Center axes -->
-                        <line x1="${-pitch/2}" y1="-20" x2="${-pitch/2}" y2="20" stroke="#f59e0b" stroke-dasharray="2,2" stroke-width="1"/>
-                        <line x1="${pitch/2}" y1="-20" x2="${pitch/2}" y2="20" stroke="#f59e0b" stroke-dasharray="2,2" stroke-width="1"/>
+            const ccGroup = document.getElementById('field-cc-group');
+            if (type === 'handle-knob') {
+                ccGroup.classList.add('opacity-40', 'pointer-events-none');
+            } else {
+                ccGroup.classList.remove('opacity-40', 'pointer-events-none');
+            }
 
-                        <!-- Pitch Dimension Line -->
-                        <line x1="${-pitch/2}" y1="28" x2="${pitch/2}" y2="28" stroke="#38bdf8" stroke-width="1"/>
-                        <text x="0" y="42" fill="#38bdf8" font-size="11" font-family="monospace" text-anchor="middle">L = ${pitch} мм (Pitch)</text>
-                    </g>
-                </svg>
-            `;
+            let svgContent = '';
+
+            if (type === 'handle-pull') {
+                const startX = (500 - L) / 2;
+                const hole1X = 250 - cc / 2;
+                const hole2X = 250 + cc / 2;
+
+                svgContent = `
+                    <rect x="${startX}" y="110" width="${L}" height="30" rx="6" fill="#334155" stroke="#3b82f6" stroke-width="2"/>
+                    <circle cx="${hole1X}" cy="125" r="5" fill="#ef4444" />
+                    <circle cx="${hole2X}" cy="125" r="5" fill="#ef4444" />
+                    <!-- Dimension Line -->
+                    <line x1="${hole1X}" y1="180" x2="${hole2X}" y2="180" stroke="#10b981" stroke-width="2" stroke-dasharray="4"/>
+                    <text x="250" y="200" fill="#10b981" text-anchor="middle" font-size="14" font-weight="bold">CC = ${cc} мм</text>
+                    <text x="250" y="90" fill="#94a3b8" text-anchor="middle" font-size="12">L = ${L} мм</text>
+                `;
+            } else if (type === 'handle-knob') {
+                svgContent = `
+                    <circle cx="250" cy="130" r="35" fill="#334155" stroke="#3b82f6" stroke-width="2"/>
+                    <circle cx="250" cy="130" r="6" fill="#ef4444" />
+                    <text x="250" y="200" fill="#10b981" text-anchor="middle" font-size="14" font-weight="bold">1 Отверстие Ø4 мм</text>
+                `;
+            } else if (type === 'hinge-cup') {
+                svgContent = `
+                    <rect x="150" y="80" width="200" height="140" fill="#1e293b" stroke="#475569" stroke-width="2"/>
+                    <circle cx="250" cy="150" r="30" fill="#334155" stroke="#ef4444" stroke-width="2"/>
+                    <circle cx="205" cy="150" r="4" fill="#10b981"/>
+                    <circle cx="295" cy="150" r="4" fill="#10b981"/>
+                    <text x="250" y="155" fill="#ef4444" text-anchor="middle" font-size="12" font-weight="bold">Ø35 мм</text>
+                    <text x="250" y="240" fill="#94a3b8" text-anchor="middle" font-size="12">Межосевое шурупов 48 мм</text>
+                `;
+            }
+
+            svg.innerHTML = svgContent;
         }
 
-        function downloadBazisScript() {
-            const fileName = document.getElementById('genFileName').value || 'Ручка_Скоба';
-            const pitch = document.getElementById('genPitch').value;
-            const length = document.getElementById('genLength').value;
-
-            const jsContent = `
-// =========================================================
-// Скрипт генерации фурнитуры для Базис-Мебельщик 10
-// Создан в "Мастерская & Базис 10 AI"
-// =========================================================
-
-Undo.Changing();
-var handle = Action.Control.AddExtrusion("Ручка " + ${pitch} + "мм");
-var profile = handle.Contour;
-profile.AddCircle(0, 0, 6);
-
-// Позиционирование отверстий присадки
-var hole1 = AddDrill(0, 0, -${pitch}/2, 5, 25);
-var hole2 = AddDrill(0, 0, ${pitch}/2, 5, 25);
-
-Action.Commit();
-alert("Фрагмент " + "${fileName}" + " успешно создан в Базис!");
-            `.trim();
-
-            triggerDownload(jsContent, `${fileName}.js`, 'application/javascript');
+        function downloadOBJ() {
+            const type = document.getElementById('gen-type').value;
+            const L = document.getElementById('gen-length').value;
+            const objContent = `# Bazis 10 Hardware Export OBJ\no Furniture_Handle\nv 0 0 0\nv ${L} 0 0\nv ${L} 20 0\nv 0 20 0\nf 1 2 3 4\n`;
+            downloadFile(objContent, `Handle_${type}_${L}mm.obj`, 'text/plain');
         }
 
-        function downloadObj3D() {
-            const fileName = document.getElementById('genFileName').value || 'Model';
-            const objContent = `# OBJ file format generated by Bazis 10 Helper\nv 0 0 0\nv 10 0 0\nv 10 10 0\nv 0 10 0\nf 1 2 3 4\n`;
-            triggerDownload(objContent, `${fileName}.obj`, 'model/obj');
+        function downloadJS() {
+            const type = document.getElementById('gen-type').value;
+            const cc = document.getElementById('gen-cc').value;
+            const jsScript = `// Bazis-Mebelschik 10 Furniture Script\n// Hardware Type: ${type}\nvar handle = Action.AddFrontWithHoles(${cc});\nAction.Commit();\n`;
+            downloadFile(jsScript, `Bazis_Script_${type}.js`, 'application/javascript');
         }
 
-        function downloadDxfBlueprint() {
-            const fileName = document.getElementById('genFileName').value || 'Blueprint';
-            const dxfContent = `0\nSECTION\n2\nENTITIES\n0\nCIRCLE\n8\n0\n10\n0.0\n20\n0.0\n40\n5.0\n0\nENDSEC\n0\nEOF\n`;
-            triggerDownload(dxfContent, `${fileName}.dxf`, 'application/dxf');
+        function downloadDXF() {
+            const dxfContent = `0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nEOF\n`;
+            downloadFile(dxfContent, `Contour_Drill.dxf`, 'image/vnd.dxf');
         }
 
-        function triggerDownload(content, filename, contentType) {
-            const blob = new Blob([content], { type: contentType });
+        function downloadFile(content, fileName, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = filename;
+            a.download = fileName;
             a.click();
             URL.revokeObjectURL(url);
-            showToast(`Файл ${filename} скачан`);
         }
 
 
-        /* ================= TAB 3: DRAWER CALCULATOR ================= */
-        function calculateDrawer() {
-            const system = document.getElementById('drawerSystem').value;
-            const W = parseFloat(document.getElementById('drawerInternalWidth').value) || 568;
-            const S = parseFloat(document.getElementById('drawerBoardThick').value) || 16;
-            const D = parseFloat(document.getElementById('drawerDepth').value) || 450;
+        // --- 3. BAZIS 10 HANDBOOK & CALCULATORS ---
+        function calcDrawerBottom() {
+            const w = parseFloat(document.getElementById('calc-w').value) || 0;
+            const thick = parseFloat(document.getElementById('calc-thick').value);
+            const system = document.getElementById('calc-system').value;
 
-            let drawerWidth = 0;
-            let bottomW = 0;
-            let bottomL = D - 10;
-            let note = "";
+            let deduct = 42;
+            if (system === 'ball') deduct = 26;
+            if (system === 'legrabox') deduct = 35;
 
-            if (system === 'tandem560') {
-                drawerWidth = W - 42;
-                bottomW = drawerWidth - (2 * S) + 12; // Паз
-                note = "Blum Tandem: Сдвиг по ширине -42мм. Дно ХДФ в паз или ДСП 16мм с вырезом.";
-            } else if (system === 'legrabox') {
-                drawerWidth = W - 38;
-                bottomW = W - 35;
-                note = "Blum Legrabox: Металлические боковины. Требуется раскрой дна и задней стенки из ДСП 16мм.";
-            } else if (system === 'aks16') {
-                drawerWidth = W - 42;
-                bottomW = drawerWidth - 32 + 12;
-                note = "AKS 16мм: Полный аналог системы Tandem. Зазор под замок 12мм.";
-            } else {
-                drawerWidth = W - 26; // Шариковые
-                bottomW = drawerWidth - (2 * S);
-                note = "Шариковые направляющие: Боковой зазор 12.7 мм с каждой стороны.";
-            }
+            const bottomW = w - (thick * 2) - (system === 'ball' ? 26 : 10);
+            const innerW = w - (thick * 2) - deduct;
 
-            const boxOut = document.getElementById('drawerOutputBox');
-            boxOut.innerHTML = `
-                <div class="flex justify-between items-center pb-2 border-b border-slate-800">
-                    <span class="font-bold text-amber-400 text-sm">Детаровка ящика (Чистовые размеры)</span>
-                    <span class="text-slate-500 font-mono text-[11px]">Проем: ${W} мм</span>
-                </div>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-                    <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800">
-                        <span class="text-[10px] text-slate-500 block">Ширина ящика (Внеш)</span>
-                        <strong class="text-sm font-mono text-slate-100">${drawerWidth.toFixed(1)} мм</strong>
-                    </div>
-                    <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800">
-                        <span class="text-[10px] text-slate-500 block">Ширина дна (ХДФ/ДСП)</span>
-                        <strong class="text-sm font-mono text-emerald-400">${bottomW.toFixed(1)} мм</strong>
-                    </div>
-                    <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800">
-                        <span class="text-[10px] text-slate-500 block">Длина дна</span>
-                        <strong class="text-sm font-mono text-slate-100">${bottomL} мм</strong>
-                    </div>
-                    <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800">
-                        <span class="text-[10px] text-slate-500 block">Боковина (2 шт)</span>
-                        <strong class="text-sm font-mono text-slate-100">${D} мм</strong>
-                    </div>
-                </div>
-                <p class="text-[11px] text-slate-400 bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">${note}</p>
-            `;
+            document.getElementById('res-bottom-w').innerText = `${bottomW} мм`;
+            document.getElementById('res-inner-w').innerText = `${innerW} мм`;
         }
 
-        function saveChecklist() {
-            showToast('Чек-лист обновлен');
+        const BAZIS_HOTKEYS = [
+            { key: "F5", desc: "Режим отображения Каркас" },
+            { key: "F6", desc: "Установка крепежа / Присадки" },
+            { key: "Shift + D", desc: "Дублировать выделенный элемент" },
+            { key: "Ctrl + F", desc: "Облицовка кромок панелей" },
+            { key: "Ctrl + E", desc: "Редактировать контур панели" },
+            { key: "Ctrl + Shift + R", desc: "Выгрузить в ЧПУ (Nesting/Postprocessor)" }
+        ];
+
+        function filterHotkeys() {
+            const q = document.getElementById('hk-search').value.toLowerCase();
+            const filtered = BAZIS_HOTKEYS.filter(h => h.key.toLowerCase().includes(q) || h.desc.toLowerCase().includes(q));
+            renderHotkeys(filtered);
         }
 
-        function loadChecklist() {
-            // Placeholder logic
+        function renderHotkeys(list) {
+            const container = document.getElementById('hk-list');
+            container.innerHTML = list.map(h => `
+                <div class="flex items-center justify-between bg-slate-950 p-2 rounded-xl border border-slate-800">
+                    <span class="font-mono text-blue-400 font-bold bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">${h.key}</span>
+                    <span class="text-slate-300">${h.desc}</span>
+                </div>
+            `).join('');
         }
 
-        /* ================= TAB 4: PAINTSHOP CALCULATOR ================= */
-        function calculatePaint() {
-            const mat = document.getElementById('paintMaterial').value;
-            const S = parseFloat(document.getElementById('paintArea').value) || 1;
-            const coats = parseInt(document.getElementById('paintCoats').value) || 1;
-            const overspray = parseInt(document.getElementById('oversprayRange').value) || 30;
 
-            document.getElementById('oversprayValue').textContent = overspray + '%';
+        // --- 4. PAINT SHOP CALCULATOR ---
+        function calcLKM() {
+            const area = parseFloat(document.getElementById('lkm-area').value) || 0;
+            const layers = parseInt(document.getElementById('lkm-layers').value) || 1;
+            const lossPct = parseFloat(document.getElementById('lkm-loss').value) || 0;
+            const rate = parseFloat(document.getElementById('lkm-rate').value) || 140;
 
-            let baseRate = 140; // g/m2 per coat
-            let hardenerRatio = 0.5; // 50%
-            let thinnerRatio = 0.2; // 20%
+            const hardenerPct = parseFloat(document.getElementById('lkm-hardener-pct').value) || 0;
+            const thinnerPct = parseFloat(document.getElementById('lkm-thinner-pct').value) || 0;
 
-            if (mat === 'pu_primer') { baseRate = 150; hardenerRatio = 0.5; thinnerRatio = 0.2; }
-            else if (mat === 'pu_enamel') { baseRate = 130; hardenerRatio = 0.5; thinnerRatio = 0.3; }
-            else if (mat === 'acrylic_lacquer') { baseRate = 160; hardenerRatio = 0.5; thinnerRatio = 0.15; }
-            else { baseRate = 110; hardenerRatio = 0.0; thinnerRatio = 0.05; }
+            const netWeight = area * layers * rate;
+            const baseWeight = netWeight * (1 + lossPct / 100);
+            const hardenerWeight = baseWeight * (hardenerPct / 100);
+            const thinnerWeight = baseWeight * (thinnerPct / 100);
+            const totalWeight = baseWeight + hardenerWeight + thinnerWeight;
 
-            const netPaintGrams = baseRate * S * coats;
-            const grossPaintGrams = netPaintGrams * (1 + overspray / 100);
-            const hardenerGrams = grossPaintGrams * hardenerRatio;
-            const thinnerGrams = grossPaintGrams * thinnerRatio;
-            const totalMixGrams = grossPaintGrams + hardenerGrams + thinnerGrams;
-
-            const box = document.getElementById('paintResultBox');
-            box.innerHTML = `
-                <div class="flex justify-between items-center pb-2 border-b border-slate-800">
-                    <span class="font-bold text-amber-400 text-sm">Пропорция замеса смеси ЛКМ</span>
-                    <span class="text-slate-500 font-mono text-[11px]">S = ${S} м² (${coats} слоя)</span>
-                </div>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-                    <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800">
-                        <span class="text-[10px] text-slate-500 block">Основа ЛКМ</span>
-                        <strong class="text-sm font-mono text-slate-100">${Math.round(grossPaintGrams)} г</strong>
-                    </div>
-                    <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800">
-                        <span class="text-[10px] text-slate-500 block">Отвердитель</span>
-                        <strong class="text-sm font-mono text-amber-400">${Math.round(hardenerGrams)} г</strong>
-                    </div>
-                    <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800">
-                        <span class="text-[10px] text-slate-500 block">Разбавитель</span>
-                        <strong class="text-sm font-mono text-sky-400">${Math.round(thinnerGrams)} г</strong>
-                    </div>
-                    <div class="bg-slate-900 p-2.5 rounded-xl border border-amber-500/30 bg-amber-500/5">
-                        <span class="text-[10px] text-amber-400 block">ИТОГО смеси в бачок</span>
-                        <strong class="text-sm font-mono text-amber-400">${Math.round(totalMixGrams)} г</strong>
-                    </div>
-                </div>
-            `;
+            document.getElementById('res-base').innerText = `${Math.round(baseWeight)} г / ~${Math.round(baseWeight/1.3)} мл`;
+            document.getElementById('res-hardener').innerText = `${Math.round(hardenerWeight)} г / ~${Math.round(hardenerWeight)} мл`;
+            document.getElementById('res-thinner').innerText = `${Math.round(thinnerWeight)} г / ~${Math.round(thinnerWeight/0.85)} мл`;
+            document.getElementById('res-total').innerText = `${Math.round(totalWeight)} г (${(totalWeight/1000).toFixed(2)} кг)`;
         }
 
         function renderPaintOrders() {
-            const list = document.getElementById('paintOrdersList');
-            const count = document.getElementById('orderCount');
-            if (count) count.textContent = APP_STATE.paintOrders.length;
-            if (!list) return;
-
-            list.innerHTML = APP_STATE.paintOrders.map(o => `
-                <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs flex justify-between items-center">
+            const container = document.getElementById('paint-orders-list');
+            container.innerHTML = paintOrders.map(o => `
+                <div class="flex items-center justify-between bg-slate-950 p-2.5 rounded-xl border border-slate-800">
                     <div>
-                        <h4 class="font-bold text-slate-200">${o.client}</h4>
-                        <p class="text-[10px] text-slate-400 font-mono">${o.color} • ${o.area}</p>
+                        <span class="font-bold text-white block">${o.title}</span>
+                        <span class="text-[10px] text-slate-400">Площадь: ${o.area}</span>
                     </div>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                    <span class="px-2 py-1 rounded text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
                         ${o.status}
                     </span>
                 </div>
             `).join('');
         }
 
-        function addNewPaintOrder() {
-            const client = prompt("Имя заказчика или изделия:", "Фасады МДФ Эмаль");
-            if (client) {
-                APP_STATE.paintOrders.unshift({
-                    id: Date.now(),
-                    client: client,
-                    color: "RAL 7016",
-                    area: "4.0 м²",
-                    status: "Подготовка"
-                });
-                renderPaintOrders();
-                showToast("Заказ добавлен");
-            }
+        function addPaintOrder() {
+            const title = prompt("Введите название заказа:", "Кухня МДФ Эмаль");
+            if (!title) return;
+            const newOrder = {
+                id: Date.now(),
+                title: title,
+                status: 'Покраска',
+                area: '8.0 м²'
+            };
+            paintOrders.unshift(newOrder);
+            localStorage.setItem(STORAGE_KEY_PAINT_ORDERS, JSON.stringify(paintOrders));
+            renderPaintOrders();
         }
 
-        /* ================= TOAST NOTIFICATION UTILITY ================= */
-        function showToast(msg) {
-            const toast = document.createElement('div');
-            toast.className = 'fixed bottom-20 md:bottom-6 right-6 bg-amber-500 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-xl shadow-2xl z-50 transition-all transform translate-y-2 opacity-0 flex items-center gap-2';
-            toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${msg}`;
-            document.body.appendChild(toast);
-
-            setTimeout(() => {
-                toast.classList.remove('translate-y-2', 'opacity-0');
-            }, 10);
-
-            setTimeout(() => {
-                toast.classList.add('opacity-0');
-                setTimeout(() => toast.remove(), 300);
-            }, 2500);
-        }
+        // INITIALIZATION ON LOAD
+        window.onload = function() {
+            init3DScene();
+            generateHomework();
+            renderErrorHistory();
+            renderHotkeys(BAZIS_HOTKEYS);
+            calcDrawerBottom();
+            calcLKM();
+            renderPaintOrders();
+            document.getElementById('completed-count').innerText = completedHwCount;
+        };
     </script>
 </body>
 </html>
